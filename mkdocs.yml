@@ -1,0 +1,88 @@
+site_name: Teable-Client Documentation
+site_description: Documentation for the Teable-Client Python Library
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - admonition
+  - pymdownx.details
+  - attr_list
+  - def_list
+  - tables
+  - footnotes
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [../teable-client]
+          options:
+            show_source: true
+            show_root_heading: true
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - getting-started/installation.md
+    - getting-started/quickstart.md
+  - Spaces:
+    - spaces/creation.md
+    - spaces/management.md
+    - spaces/configuration.md
+  - Bases:
+    - bases/creation.md
+    - bases/management.md
+    - bases/table-integration.md
+  - Tables:
+    - tables/creation.md
+    - tables/management.md
+    - tables/connection.md
+    - tables/data-insertion.md
+    - tables/bulk-operations.md
+  - Views:
+    - views/creation.md
+  - Fields:
+    - fields/configuration.md
+    - fields/validation.md
+  - Records:
+    - records/create.md
+    - records/read.md
+    - records/update.md
+    - records/delete.md
+    - records/bulk-operations.md
+  - Advanced Topics:
+    - advanced/authentication.md
+    - advanced/error-handling.md
+    - advanced/best-practices.md
+    - integration/sync.md
+    - automation/workflows.md
+  - API Reference:
+    - api/client.md
+    - api/models.md
+    - api/exceptions.md
