@@ -1,6 +1,6 @@
 # Reading and Querying Records
 
-This guide covers how to read and query records in Teable tables using the Teable-Client library. Learn about retrieving individual records, querying multiple records, and using various filtering and sorting options.
+This guide covers how to read and query records in Teable tables using the Teable-Client library.
 
 ## Reading Individual Records
 
@@ -15,12 +15,10 @@ client = TeableClient(TeableConfig(
     api_key="your-api-key"
 ))
 
-# Get your table
-table = client.get_table("table_id")
-
 # Get a record by ID
 try:
-    record = table.get_record(
+    record = client.records.get(
+        table_id="table_id",
         record_id="rec123",
         cell_format="json"  # or "text"
     )
@@ -34,7 +32,8 @@ except ResourceNotFoundError:
 
 ```python
 # Get specific fields only
-record = table.get_record(
+record = client.records.get(
+    table_id="table_id",
     record_id="rec123",
     projection=["Name", "Email", "Department"]
 )
@@ -50,61 +49,53 @@ print(f"Email: {record.fields.get('Email')}")
 
 ```python
 # Get all records
-records = table.get_records()
+records = client.records.get_records(
+    table_id="table_id"
+)
 
 # Process records
 for record in records:
     print(f"Record ID: {record.record_id}")
-    print(f"Name: {record.fields.get('Name')}")
+    print(f"Fields: {record.fields}")
     print("---")
 ```
 
-### Filtering Records
+### Using Query Builder
 
 ```python
-# Filter by field value
-records = table.get_records(
-    filter={
-        "field": "Department",
-        "operator": "=",
-        "value": "Engineering"
-    }
+from teable import FilterOperator, SortDirection
+
+# Get table for query builder
+table = client.tables.get("table_id")
+
+# Create a query using the query builder
+query = table.query()
+
+# Add filters
+query.filter(
+    field="Department",
+    operator=FilterOperator.EQUALS,
+    value="Engineering"
+)
+query.filter(
+    field="Salary",
+    operator=FilterOperator.GREATER_THAN,
+    value=75000
 )
 
-# Multiple conditions
-records = table.get_records(
-    filter={
-        "operator": "and",
-        "conditions": [
-            {
-                "field": "Department",
-                "operator": "=",
-                "value": "Engineering"
-            },
-            {
-                "field": "Salary",
-                "operator": ">",
-                "value": 75000
-            }
-        ]
-    }
-)
-```
-
-### Sorting Records
-
-```python
-# Sort by a single field
-records = table.get_records(
-    order_by="Name"  # Ascending order
+# Add sorting
+query.sort(
+    field="Name",
+    direction=SortDirection.ASCENDING
 )
 
-# Sort by multiple fields
-records = table.get_records(
-    order_by=[
-        {"field": "Department", "direction": "asc"},
-        {"field": "Salary", "direction": "desc"}
-    ]
+# Add pagination
+query.paginate(take=10)
+
+# Execute the query
+records = client.records.get_records(
+    table_id="table_id",
+    query=query.build()
 )
 ```
 
@@ -112,68 +103,10 @@ records = table.get_records(
 
 ```python
 # Get records with pagination
-records = table.get_records(
+records = client.records.get_records(
+    table_id="table_id",
     take=50,    # Number of records to return
     skip=100    # Number of records to skip
-)
-```
-
-## Advanced Querying
-
-### Using Query Builder
-
-```python
-# Create a query using the query builder
-query = table.query()\
-    .filter("Department", "=", "Engineering")\
-    .filter("Salary", ">", 75000)\
-    .sort("Name")\
-    .paginate(take=10)
-
-# Execute the query
-records = table.get_records(query=query)
-```
-
-### Search Functionality
-
-```python
-# Search across fields
-records = table.get_records(
-    search=["John", "Name", True]  # [value, field, exact match]
-)
-
-# Full-text search
-records = table.get_records(
-    filter_by_tql="John"  # Teable Query Language
-)
-```
-
-### Filtering Link Fields
-
-```python
-# Filter by linked record candidates
-records = table.get_records(
-    filter_link_cell_candidate="rec123"
-)
-
-# Filter by selected linked records
-records = table.get_records(
-    filter_link_cell_selected=["rec123", "rec456"]
-)
-```
-
-### View-Based Queries
-
-```python
-# Get records from a specific view
-records = table.get_records(
-    view_id="viw123"
-)
-
-# Get records from a view, ignoring view's query
-records = table.get_records(
-    view_id="viw123",
-    ignore_view_query=True
 )
 ```
 
@@ -183,12 +116,14 @@ records = table.get_records(
 
 ```python
 # Get records with JSON formatting
-records = table.get_records(
+records = client.records.get_records(
+    table_id="table_id",
     cell_format="json"
 )
 
 # Get records with text formatting
-records = table.get_records(
+records = client.records.get_records(
+    table_id="table_id",
     cell_format="text"
 )
 ```
@@ -197,12 +132,14 @@ records = table.get_records(
 
 ```python
 # Use field names as keys
-records = table.get_records(
+records = client.records.get_records(
+    table_id="table_id",
     field_key_type="name"
 )
 
 # Use field IDs as keys
-records = table.get_records(
+records = client.records.get_records(
+    table_id="table_id",
     field_key_type="id"
 )
 ```
@@ -212,13 +149,16 @@ records = table.get_records(
 ```python
 from teable.exceptions import TeableError, ResourceNotFoundError
 
-def safe_get_records(table, **query_params):
+def safe_get_records(client, table_id, **query_params):
     """Safely get records with error handling."""
     try:
-        records = table.get_records(**query_params)
+        records = client.records.get_records(
+            table_id=table_id,
+            **query_params
+        )
         return records
     except ResourceNotFoundError:
-        print("Table or view not found")
+        print("Table not found")
         return []
     except TeableError as e:
         print(f"Error retrieving records: {e}")
@@ -230,16 +170,18 @@ def safe_get_records(table, **query_params):
 ### Projection Optimization
 
 ```python
-def get_minimal_records(table, required_fields):
+def get_minimal_records(client, table_id, required_fields):
     """Get records with only required fields."""
-    return table.get_records(
+    return client.records.get_records(
+        table_id=table_id,
         projection=required_fields,
         cell_format="json"
     )
 
 # Example usage
 minimal_records = get_minimal_records(
-    table,
+    client,
+    "table_id",
     ["Name", "Email"]
 )
 ```
@@ -247,11 +189,12 @@ minimal_records = get_minimal_records(
 ### Batch Processing
 
 ```python
-def process_records_in_batches(table, batch_size=1000):
+def process_records_in_batches(client, table_id, batch_size=1000):
     """Process records in batches to manage memory."""
     processed = 0
     while True:
-        batch = table.get_records(
+        batch = client.records.get_records(
+            table_id=table_id,
             skip=processed,
             take=batch_size
         )
@@ -284,8 +227,8 @@ def process_records_in_batches(table, batch_size=1000):
 3. **Performance**
    - Use batch processing for large datasets
    - Optimize query filters
-   - Consider view-based queries
    - Monitor query performance
+   - Use appropriate cell formats
 
 4. **Data Format**
    - Choose appropriate cell formats

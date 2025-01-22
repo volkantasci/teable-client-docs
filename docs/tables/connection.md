@@ -1,22 +1,13 @@
 # Table Connections and Relationships
 
-This guide covers how to establish and manage connections between tables in Teable using the Teable-Client library. Table connections allow you to create relationships between different tables and link related data.
+This guide covers how to establish and manage connections between tables in Teable using the Teable-Client library.
 
-## Understanding Table Relationships
+## Creating Reference Fields
 
-Teable supports different types of relationships between tables:
-
-- **One-to-One**: Each record in the first table corresponds to exactly one record in the second table
-- **One-to-Many**: Each record in the first table can be linked to multiple records in the second table
-- **Many-to-One**: Multiple records in the first table can be linked to a single record in the second table
-- **Many-to-Many**: Records in both tables can have multiple connections to each other
-
-## Creating Linked Fields
-
-### Basic Link Field
+### Basic Reference Field
 
 ```python
-from teable import TeableClient, TeableConfig
+from teable import TeableClient, TeableConfig, FieldType
 
 # Initialize the client
 client = TeableClient(TeableConfig(
@@ -25,179 +16,111 @@ client = TeableClient(TeableConfig(
 ))
 
 # Get your tables
-employees_table = client.get_table("employees_table_id")
-projects_table = client.get_table("projects_table_id")
+employees_table = client.tables.get("employees_table_id")
+projects_table = client.tables.get("projects_table_id")
 
-# Create a link field in the projects table to link to employees
-link_field = {
-    "name": "Project Manager",
-    "type": "link",
-    "options": {
-        "relationship": "many_to_one",  # Each project has one manager
-        "foreignTableId": employees_table.table_id,
-        "symmetricFieldId": None  # Optional: ID of the reciprocal field
+# Create a reference field in the projects table
+reference_field = client.fields.create(
+    table_id=projects_table.table_id,
+    name="Project Manager",
+    field_type=FieldType.REFERENCE,
+    options={
+        "table_id": employees_table.table_id
     }
-}
-
-# Add the link field to the projects table
-projects_table.create_field(link_field)
+)
 ```
 
-### Bidirectional Links
+## Working with Referenced Records
 
-Create linked fields that automatically maintain relationships in both directions:
-
-```python
-# Create a bidirectional link between employees and projects
-manager_field = {
-    "name": "Project Manager",
-    "type": "link",
-    "options": {
-        "relationship": "many_to_one",
-        "foreignTableId": employees_table.table_id
-    }
-}
-
-# Create the field and get its ID
-manager_link = projects_table.create_field(manager_field)
-
-# Create the reciprocal field in the employees table
-managed_projects_field = {
-    "name": "Managed Projects",
-    "type": "link",
-    "options": {
-        "relationship": "one_to_many",
-        "foreignTableId": projects_table.table_id,
-        "symmetricFieldId": manager_link.field_id
-    }
-}
-
-employees_table.create_field(managed_projects_field)
-```
-
-## Working with Linked Records
-
-### Creating Records with Links
+### Creating Records with References
 
 ```python
 # Create a project and link it to an existing employee
-project = projects_table.create_record({
-    "Project Name": "New Website",
-    "Project Manager": ["employee123"]  # Link to employee by ID
-})
+project = client.records.create(
+    table_id=projects_table.table_id,
+    fields={
+        "Project Name": "New Website",
+        "Project Manager": ["employee123"]  # Reference employee by ID
+    }
+)
 
-# Create multiple links
-project = projects_table.create_record({
-    "Project Name": "Big Initiative",
-    "Team Members": ["employee123", "employee456"]  # Many-to-many relationship
-})
+# Create with multiple references
+project = client.records.create(
+    table_id=projects_table.table_id,
+    fields={
+        "Project Name": "Big Initiative",
+        "Team Members": ["employee123", "employee456"]
+    }
+)
 ```
 
-### Querying Linked Records
+### Querying Referenced Records
 
 ```python
-# Get all projects managed by a specific employee
-projects = projects_table.get_records(
-    filter={
-        "field": "Project Manager",
-        "operator": "=",
-        "value": "employee123"
-    }
-)
+from teable import FilterOperator
 
-# Get projects with specific team members
-projects = projects_table.get_records(
-    filter={
-        "field": "Team Members",
-        "operator": "contains",
-        "value": "employee123"
+# Get all projects managed by a specific employee
+projects = client.records.get_records(
+    table_id=projects_table.table_id,
+    query={
+        "filter": {
+            "operator": "and",
+            "conditions": [
+                {
+                    "field": "Project Manager",
+                    "operator": FilterOperator.EQUALS,
+                    "value": "employee123"
+                }
+            ]
+        }
     }
 )
 ```
 
-### Updating Linked Records
+### Updating Referenced Records
 
 ```python
 # Update project manager
-projects_table.update_record(
+client.records.update(
+    table_id=projects_table.table_id,
     record_id="project123",
     fields={
         "Project Manager": ["new_manager_id"]
     }
 )
 
-# Add team members
-current_team = project.fields["Team Members"]
-projects_table.update_record(
+# Update team members
+client.records.update(
+    table_id=projects_table.table_id,
     record_id="project123",
     fields={
-        "Team Members": current_team + ["new_member_id"]
+        "Team Members": ["member1", "member2", "new_member"]
     }
 )
-```
-
-## Advanced Link Features
-
-### Lookup Fields
-
-Create fields that display data from linked records:
-
-```python
-# Create a lookup field to show manager's email
-lookup_field = {
-    "name": "Manager Email",
-    "type": "lookup",
-    "options": {
-        "relationship": "many_to_one",
-        "foreignTableId": employees_table.table_id,
-        "lookupFieldId": "email_field_id"  # ID of the email field in employees table
-    }
-}
-
-projects_table.create_field(lookup_field)
-```
-
-### Rollup Fields
-
-Create fields that aggregate data from linked records:
-
-```python
-# Create a rollup field to count team members
-rollup_field = {
-    "name": "Team Size",
-    "type": "rollup",
-    "options": {
-        "relationship": "one_to_many",
-        "foreignTableId": employees_table.table_id,
-        "rollupFunction": "count"
-    }
-}
-
-projects_table.create_field(rollup_field)
 ```
 
 ## Best Practices
 
 1. **Relationship Planning**
    - Plan your table relationships before implementation
-   - Choose appropriate relationship types
+   - Choose appropriate field types
    - Consider data integrity implications
    - Document relationship purposes
 
 2. **Field Naming**
-   - Use clear, descriptive names for linked fields
+   - Use clear, descriptive names for reference fields
    - Maintain consistent naming conventions
-   - Consider bidirectional relationship names
    - Document field relationships
+   - Consider field organization
 
 3. **Performance**
-   - Use appropriate relationship types
+   - Use appropriate field types
    - Consider query performance implications
-   - Index frequently queried linked fields
-   - Limit unnecessary bidirectional links
+   - Monitor reference field usage
+   - Optimize queries when possible
 
 4. **Data Integrity**
-   - Validate linked records exist
+   - Validate referenced records exist
    - Handle deleted records appropriately
    - Maintain referential integrity
    - Regular relationship audits
@@ -208,29 +131,29 @@ projects_table.create_field(rollup_field)
 from teable.exceptions import TeableError, ValidationError
 
 try:
-    # Create a linked field
-    link_field = {
-        "name": "Project Manager",
-        "type": "link",
-        "options": {
-            "relationship": "many_to_one",
-            "foreignTableId": employees_table.table_id
+    # Create a reference field
+    reference_field = client.fields.create(
+        table_id=projects_table.table_id,
+        name="Project Manager",
+        field_type=FieldType.REFERENCE,
+        options={
+            "table_id": employees_table.table_id
         }
-    }
-    projects_table.create_field(link_field)
+    )
 except ValidationError as e:
     print(f"Invalid field configuration: {e}")
 except TeableError as e:
-    print(f"Error creating link: {e}")
+    print(f"Error creating reference: {e}")
 
-# Validate linked records
+# Validate referenced records
 try:
-    projects_table.validate_record_fields({
+    table = client.tables.get(projects_table.table_id)
+    table.validate_record_fields({
         "Project Name": "New Project",
         "Project Manager": ["invalid_id"]
     })
 except ValidationError as e:
-    print(f"Invalid link reference: {e}")
+    print(f"Invalid reference: {e}")
 ```
 
 ## Next Steps

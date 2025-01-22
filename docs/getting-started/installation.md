@@ -23,7 +23,7 @@ pip install teable-client
 If you want to install from source, you can clone the repository and install using pip:
 
 ```bash
-git clone https://github.com/yourusername/teable-client.git
+git clone https://github.com/teableio/teable-client.git
 cd teable-client
 pip install -e .
 ```
@@ -54,8 +54,7 @@ config = TeableConfig(
     api_url="https://your-teable-instance.com/api",
     api_key="your-api-key",
     timeout=30,  # Request timeout in seconds
-    max_retries=3,  # Number of retry attempts for failed requests
-    cache_enabled=True  # Enable response caching
+    max_retries=3  # Number of retry attempts for failed requests
 )
 ```
 
@@ -75,9 +74,9 @@ client = TeableClient(config)
 
 # Test the connection
 try:
-    # Attempt to get user profile
-    profile = client.get_user_profile()
-    print(f"Connected successfully as: {profile.name}")
+    # Attempt to get spaces
+    spaces = client.spaces.get_all()
+    print(f"Connected successfully. Found {len(spaces)} spaces.")
 except Exception as e:
     print(f"Connection failed: {str(e)}")
 ```
@@ -104,32 +103,6 @@ export TEABLE_API_KEY="your-api-key"
 ```
 
 ## Troubleshooting
-
-### Common Installation Issues
-
-1. **SSL Certificate Verification Failed**
-   ```python
-   # Add certificate verification
-   config = TeableConfig(
-       api_url="https://your-teable-instance.com/api",
-       api_key="your-api-key",
-       verify_ssl=True,
-       ssl_ca_cert="/path/to/certificate"
-   )
-   ```
-
-2. **Proxy Configuration**
-   ```python
-   # Configure proxy settings
-   config = TeableConfig(
-       api_url="https://your-teable-instance.com/api",
-       api_key="your-api-key",
-       proxy={
-           "http": "http://proxy.example.com:8080",
-           "https": "https://proxy.example.com:8080"
-       }
-   )
-   ```
 
 ### Version Conflicts
 

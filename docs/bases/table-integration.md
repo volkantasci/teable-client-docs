@@ -23,11 +23,9 @@ client = TeableClient(TeableConfig(
     api_key="your-api-key"
 ))
 
-# Get a base
-base = client.get_base("base123")
-
-# Create a table
-table = base.create_table(
+# Create a table in a base
+table = client.tables.create(
+    base_id="base123",
     name="Projects",
     description="Track all company projects"
 )
@@ -40,7 +38,7 @@ table = base.create_table(
 fields = [
     {
         "name": "Project Name",
-        "type": "text",
+        "type": "singleLineText",
         "required": True
     },
     {
@@ -49,19 +47,16 @@ fields = [
     },
     {
         "name": "Status",
-        "type": "single_select",
+        "type": "singleSelect",
         "options": {
-            "choices": [
-                {"name": "Planning"},
-                {"name": "In Progress"},
-                {"name": "Completed"}
-            ]
+            "choices": ["Planning", "In Progress", "Completed"]
         }
     }
 ]
 
 # Create table with fields
-table = base.create_table(
+table = client.tables.create(
+    base_id="base123",
     name="Projects",
     fields=fields
 )
@@ -69,139 +64,128 @@ table = base.create_table(
 
 ## Managing Tables
 
-### Listing Tables
+### Getting Table Information
 
 ```python
-# Get all tables in a base
-tables = base.get_tables()
+# Get a specific table
+table = client.tables.get("table123")
 
-for table in tables:
-    print(f"Table: {table.name}")
-    print(f"ID: {table.table_id}")
-    print("Fields:")
-    for field in table.fields:
-        print(f"  - {field.name} ({field.type})")
-    print("---")
+# Access table properties
+print(f"Table ID: {table.table_id}")
+print(f"Description: {table.description}")
+
+# Access fields
+for field in table.fields:
+    print(f"Field: {field.field_id}")
+    print(f"Type: {field.field_type}")
+    print(f"Required: {field.is_required}")
 ```
 
 ### Updating Tables
 
 ```python
 # Update table properties
-table.update(
+table = client.tables.update(
+    table_id="table123",
     name="Active Projects",
     description="Track ongoing and planned projects"
 )
 ```
 
-## Table Relationships
+## Field Management
 
-### Creating Linked Fields
-
-```python
-# Create a linked field to another table
-linked_field = {
-    "name": "Project Manager",
-    "type": "link",
-    "options": {
-        "relationship": "many_to_one",
-        "foreignTableId": "employees_table_id",
-        "symmetricFieldId": "managed_projects"  # Optional
-    }
-}
-
-table.create_field(linked_field)
-```
-
-### Managing Relationships
+### Creating Fields
 
 ```python
-# Update relationship configuration
-table.update_field(
-    field_id="field123",
+from teable import FieldType
+
+# Create a single select field
+field = client.fields.create(
+    table_id="table123",
+    name="Priority",
+    field_type=FieldType.SINGLE_SELECT,
     options={
-        "relationship": "many_to_many",
-        "symmetricFieldId": "new_symmetric_field"
+        "choices": ["High", "Medium", "Low"]
+    }
+)
+
+# Create a number field
+field = client.fields.create(
+    table_id="table123",
+    name="Budget",
+    field_type=FieldType.NUMBER,
+    options={
+        "precision": 2,
+        "format": "currency"
     }
 )
 ```
 
-## Views Integration
+### Updating Fields
+
+```python
+# Update field properties
+field = client.fields.update(
+    field_id="field123",
+    name="Project Priority",
+    options={
+        "choices": ["Critical", "High", "Medium", "Low"]
+    }
+)
+```
+
+## View Management
 
 ### Creating Views
 
 ```python
-# Create a view for the table
-view = table.create_view({
-    "name": "Active Projects",
-    "type": "grid",
-    "filter": {
+from teable import FilterOperator, SortDirection
+
+# Create a view
+view = client.views.create(
+    table_id="table123",
+    name="Active Projects",
+    type="grid",
+    filter={
         "operator": "and",
         "conditions": [
             {
                 "field": "Status",
-                "operator": "=",
+                "operator": FilterOperator.EQUALS,
                 "value": "In Progress"
             }
         ]
     },
-    "sort": [
+    sort=[
         {
             "field": "Start Date",
-            "direction": "desc"
+            "direction": SortDirection.DESCENDING
         }
     ]
-})
+)
 ```
 
 ### Managing Views
 
 ```python
-# List views
-views = table.get_views()
+# Get views from table
+views = table.views
 
 # Update view configuration
-view.update({
-    "name": "Current Projects",
-    "filter": {
+view = client.views.update(
+    view_id="view123",
+    name="Current Projects",
+    filter={
         "operator": "and",
         "conditions": [
             {
                 "field": "Status",
-                "operator": "in",
+                "operator": FilterOperator.IN,
                 "value": ["Planning", "In Progress"]
             }
         ]
     }
-})
-```
-
-## Data Integration
-
-### Importing Data
-
-```python
-# Import data from CSV
-with open('projects.csv', 'rb') as file:
-    table.import_csv(
-        file,
-        chunk_size=1000,  # Optional: Process in chunks
-        field_mapping={    # Optional: Map CSV columns to fields
-            "Project": "Project Name",
-            "Start": "Start Date"
-        }
-    )
-```
-
-### Exporting Data
-
-```python
-# Export table data
-export = table.export_csv()
-
-# Save to file
-with open('projects_export.csv', 'wb') as file:
-    file.write(export.content)
+)
 ```
 
 ## Best Practices
@@ -210,21 +194,15 @@ with open('projects_export.csv', 'wb') as file:
    - Plan your table structure before creation
    - Use appropriate field types for data
    - Consider relationships between tables
-   - Document table purposes and relationships
+   - Document table purposes
 
 2. **Field Management**
    - Use clear, descriptive field names
    - Set appropriate field constraints
    - Consider field dependencies
-   - Document field usage and requirements
+   - Document field usage
 
-3. **Data Integration**
-   - Validate data before import
-   - Use appropriate chunk sizes for large imports
-   - Maintain data consistency across tables
-   - Regular data validation and cleanup
-
-4. **View Organization**
+3. **View Organization**
    - Create views for common use cases
    - Use consistent naming conventions
    - Document view purposes
@@ -237,7 +215,8 @@ from teable.exceptions import TeableError, ValidationError
 
 try:
     # Create table with fields
-    table = base.create_table(
+    table = client.tables.create(
+        base_id="base123",
         name="Projects",
         fields=fields
     )
@@ -252,26 +231,42 @@ except TeableError as e:
 1. **Batch Operations**
    ```python
    # Good - Batch create records
-   records = [{"Project Name": f"Project {i}"} for i in range(100)]
-   table.batch_create_records(records)
+   records = [
+       {"Project Name": f"Project {i}"}
+       for i in range(100)
+   ]
+   client.records.batch_create_records(
+       table_id="table123",
+       records=records
+   )
    
    # Avoid - Individual record creation
    for i in range(100):
-       table.create_record({"Project Name": f"Project {i}"})
+       client.records.create(
+           table_id="table123",
+           fields={"Project Name": f"Project {i}"}
+       )
    ```
 
-2. **Field Optimization**
+2. **Field Creation**
    ```python
-   # Good - Create all fields at once
-   table = base.create_table(
+   # Good - Create table with all fields
+   table = client.tables.create(
+       base_id="base123",
        name="Projects",
        fields=all_fields
    )
    
    # Avoid - Creating fields one by one
-   table = base.create_table(name="Projects")
+   table = client.tables.create(
+       base_id="base123",
+       name="Projects"
+   )
    for field in fields:
-       table.create_field(field)
+       client.fields.create(
+           table_id=table.table_id,
+           **field
+       )
    ```
 
 ## Next Steps

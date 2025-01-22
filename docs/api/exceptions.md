@@ -6,12 +6,14 @@ This document provides detailed API reference for all exception classes in the T
 
 ```
 TeableError
+├── APIError
+│   ├── RateLimitError
+│   ├── ResourceNotFoundError
+│   └── AuthenticationError
 ├── ValidationError
-├── AuthenticationError
-├── ResourceNotFoundError
-├── RateLimitError
+├── ConfigurationError
 ├── NetworkError
-└── ConfigurationError
+└── BatchOperationError
 ```
 
 ## Base Exception
@@ -28,20 +30,37 @@ try:
     pass
 except TeableError as e:
     print(f"Operation failed: {e}")
-    print(f"Error code: {e.code}")
-    print(f"Error details: {e.details}")
+```
+
+### APIError
+
+Base exception for all API-related errors. Provides additional context about the API response.
+
+```python
+from teable.exceptions import APIError
+
+try:
+    # Perform API operation
+    pass
+except APIError as e:
+    print(f"API error: {e}")
+    print(f"Status code: {e.status_code}")
+    print(f"Response body: {e.response_body}")
 ```
 
 Properties:
-- message (str): Human-readable error message
-- code (str): Error code identifier
-- details (Optional[Dict]): Additional error details
+- message (str): Human-readable error description
+- status_code (Optional[int]): HTTP status code if available
+- response_body (Optional[str]): Raw response body if available
 
 ## Validation Errors
 
 ### ValidationError
 
-Raised when data validation fails.
+Raised when data validation fails. This could be due to:
+- Invalid field types
+- Missing required fields
+- Value constraints violations
 
 ```python
 from teable.exceptions import ValidationError
@@ -53,21 +72,16 @@ try:
     })
 except ValidationError as e:
     print(f"Validation failed: {e}")
-    print(f"Field: {e.field}")
-    print(f"Value: {e.value}")
-    print(f"Constraint: {e.constraint}")
 ```
-
-Properties:
-- field (str): Name of the field that failed validation
-- value (Any): Invalid value that caused the error
-- constraint (str): Description of the validation constraint that failed
 
 ## Authentication Errors
 
 ### AuthenticationError
 
-Raised when authentication fails.
+Raised when authentication fails. This could be due to:
+- Invalid API key
+- Expired credentials
+- Insufficient permissions
 
 ```python
 from teable.exceptions import AuthenticationError
@@ -79,44 +93,24 @@ try:
     ))
 except AuthenticationError as e:
     print(f"Authentication failed: {e}")
-    print(f"Reason: {e.reason}")
+    print(f"Status code: {e.status_code}")
 ```
-
-Properties:
-- reason (str): Specific reason for authentication failure
-- is_expired (bool): Whether the error is due to expired credentials
-
-### TokenExpiredError
-
-Raised when an OAuth token has expired.
-
-```python
-from teable.exceptions import TokenExpiredError
-
-try:
-    # Perform authenticated operation
-    pass
-except TokenExpiredError as e:
-    print(f"Token expired: {e}")
-    print(f"Expiry time: {e.expiry_time}")
-    # Implement token refresh
-```
-
-Properties:
-- expiry_time (datetime): When the token expired
-- can_refresh (bool): Whether the token can be refreshed
 
 ## Resource Errors
 
 ### ResourceNotFoundError
 
-Raised when a requested resource doesn't exist.
+Raised when a requested resource is not found. This could be due to:
+- Invalid record ID
+- Invalid table ID
+- Invalid view ID
+- Invalid field ID
 
 ```python
 from teable.exceptions import ResourceNotFoundError
 
 try:
-    table = client.get_table("non-existent-id")
+    table = client.tables.get("non-existent-id")
 except ResourceNotFoundError as e:
     print(f"Resource not found: {e}")
     print(f"Resource type: {e.resource_type}")
@@ -126,6 +120,7 @@ except ResourceNotFoundError as e:
 Properties:
 - resource_type (str): Type of resource that wasn't found
 - resource_id (str): ID of the resource that wasn't found
+- status_code (Optional[int]): HTTP status code (typically 404)
 
 ## Rate Limiting
 
@@ -142,20 +137,22 @@ try:
 except RateLimitError as e:
     print(f"Rate limit exceeded: {e}")
     print(f"Reset time: {e.reset_time}")
-    print(f"Retry after: {e.retry_after} seconds")
+    print(f"Rate limit: {e.limit}")
 ```
 
 Properties:
-- reset_time (datetime): When the rate limit will reset
-- retry_after (int): Seconds until next retry is allowed
-- limit (int): Current rate limit
-- remaining (int): Remaining requests allowed
+- reset_time (Optional[float]): Unix timestamp when the rate limit resets
+- limit (Optional[int]): The rate limit ceiling for the given endpoint
+- status_code (Optional[int]): HTTP status code (typically 429)
 
 ## Network Errors
 
 ### NetworkError
 
-Raised for network-related issues.
+Raised when network-related issues occur. This could be due to:
+- Connection timeouts
+- DNS resolution failures
+- SSL/TLS errors
 
 ```python
 from teable.exceptions import NetworkError
@@ -165,20 +162,16 @@ try:
     pass
 except NetworkError as e:
     print(f"Network error: {e}")
-    print(f"Status code: {e.status_code}")
-    print(f"Is timeout: {e.is_timeout}")
 ```
-
-Properties:
-- status_code (Optional[int]): HTTP status code if available
-- is_timeout (bool): Whether the error is due to timeout
-- is_connection_error (bool): Whether it's a connection error
 
 ## Configuration Errors
 
 ### ConfigurationError
 
-Raised when there are configuration issues.
+Raised when there are issues with client configuration. This could be due to:
+- Missing API credentials
+- Invalid API URL
+- Missing required configuration parameters
 
 ```python
 from teable.exceptions import ConfigurationError
@@ -189,12 +182,29 @@ try:
     ))
 except ConfigurationError as e:
     print(f"Configuration error: {e}")
-    print(f"Parameter: {e.parameter}")
+```
+
+## Batch Operation Errors
+
+### BatchOperationError
+
+Raised when a batch operation partially fails.
+
+```python
+from teable.exceptions import BatchOperationError
+
+try:
+    # Perform batch operation
+    pass
+except BatchOperationError as e:
+    print(f"Batch operation error: {e}")
+    print(f"Successful operations: {e.successful_operations}")
+    print(f"Failed operations: {e.failed_operations}")
 ```
 
 Properties:
-- parameter (str): Name of the invalid configuration parameter
-- reason (str): Reason for the configuration error
+- successful_operations (list): List of successfully processed items
+- failed_operations (list): List of failed operations with their errors
 
 ## Error Handling Best Practices
 
@@ -203,17 +213,20 @@ Properties:
 ```python
 from teable.exceptions import (
     TeableError,
+    APIError,
     ValidationError,
     AuthenticationError,
     ResourceNotFoundError,
     RateLimitError,
-    NetworkError
+    NetworkError,
+    ConfigurationError,
+    BatchOperationError
 )
 
 try:
     # Perform operations
     client = TeableClient(config)
-    table = client.get_table("table_id")
+    table = client.tables.get("table_id")
     record = table.create_record(data)
     
 except ValidationError as e:
@@ -230,11 +243,23 @@ except ResourceNotFoundError as e:
     
 except RateLimitError as e:
     # Handle rate limiting
-    print(f"Rate limit exceeded. Retry after {e.retry_after} seconds")
+    print(f"Rate limit exceeded. Reset at {e.reset_time}")
     
 except NetworkError as e:
     # Handle network issues
     print(f"Network error: {e}")
+    
+except ConfigurationError as e:
+    # Handle configuration issues
+    print(f"Configuration error: {e}")
+    
+except BatchOperationError as e:
+    # Handle batch operation failures
+    print(f"Batch operation partially failed: {e}")
+    
+except APIError as e:
+    # Handle any other API-related errors
+    print(f"API error: {e}")
     
 except TeableError as e:
     # Handle any other Teable-specific errors

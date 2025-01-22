@@ -16,7 +16,7 @@ client = TeableClient(TeableConfig(
 ))
 
 # Create a new space
-space = client.create_space("My Project Space")
+space = client.spaces.create(name="My Project Space")
 print(f"Created space with ID: {space.space_id}")
 ```
 
@@ -29,7 +29,7 @@ You can add collaborators to a space with specific roles:
 ```python
 from teable import SpaceRole
 
-# Add user collaborators
+# Add collaborators
 collaborators = [
     {
         "principalId": "user123",
@@ -41,8 +41,7 @@ collaborators = [
     }
 ]
 
-client.add_space_collaborators(
-    space_id="space123",
+space.add_collaborators(
     collaborators=collaborators,
     role=SpaceRole.EDITOR
 )
@@ -54,18 +53,16 @@ You can list all collaborators in a space with various filtering options:
 
 ```python
 # List all collaborators
-collaborators = client.list_collaborators(
-    space_id="space123",
+collaborators, total = space.get_collaborators(
     include_system=True,  # Include system collaborators
     include_base=True,    # Include base information
     take=100,            # Limit results
     search="john"        # Search by name/email
 )
 
-for collaborator in collaborators['collaborators']:
-    if collaborator['type'] == 'user':
-        print(f"User: {collaborator['userName']} ({collaborator['email']})")
-        print(f"Role: {collaborator['role']}")
+for collaborator in collaborators:
+    print(f"Name: {collaborator.name}")
+    print(f"Role: {collaborator.role}")
 ```
 
 ### Updating Collaborator Roles
@@ -73,11 +70,12 @@ for collaborator in collaborators['collaborators']:
 You can update a collaborator's role:
 
 ```python
+from teable.models.collaborator import PrincipalType
+
 # Update collaborator role
-client.update_collaborator(
-    space_id="space123",
+space.update_collaborator(
     principal_id="user123",
-    principal_type="user",
+    principal_type=PrincipalType.USER,
     role=SpaceRole.CREATOR
 )
 ```
@@ -88,10 +86,9 @@ To remove a collaborator from a space:
 
 ```python
 # Remove collaborator
-client.delete_collaborator(
-    space_id="space123",
+space.delete_collaborator(
     principal_id="user123",
-    principal_type="user"
+    principal_type=PrincipalType.USER
 )
 ```
 
@@ -103,13 +100,9 @@ You can create invitation links to share with potential collaborators:
 
 ```python
 # Create an invitation link
-invitation = client.create_invitation(
-    space_id="space123",
+invitation = space.create_invitation_link(
     role=SpaceRole.EDITOR
 )
-
-print(f"Invitation URL: {invitation['inviteUrl']}")
-print(f"Invitation Code: {invitation['invitationCode']}")
 ```
 
 ### Sending Email Invitations
@@ -119,40 +112,19 @@ You can directly send invitation emails to multiple users:
 ```python
 # Send invitation emails
 emails = ["user1@example.com", "user2@example.com"]
-invitations = client.send_invitation_emails(
-    space_id="space123",
+result = space.invite_by_email(
     emails=emails,
     role=SpaceRole.EDITOR
 )
-
-for email, invitation in invitations.items():
-    print(f"Sent invitation to {email}: {invitation['invitationId']}")
 ```
 
-### Managing Invitation Links
+### Listing Invitation Links
 
-List, update, and delete invitation links:
+List all invitation links:
 
 ```python
 # List all invitation links
-invitations = client.list_invitations("space123")
-for invitation in invitations:
-    print(f"Invitation ID: {invitation['invitationId']}")
-    print(f"Role: {invitation['role']}")
-    print(f"URL: {invitation['inviteUrl']}")
-
-# Update invitation role
-updated = client.update_invitation(
-    space_id="space123",
-    invitation_id="inv123",
-    role=SpaceRole.VIEWER
-)
-
-# Delete an invitation
-client.delete_invitation(
-    space_id="space123",
-    invitation_id="inv123"
-)
+invitations = space.get_invitation_links()
 ```
 
 ## Best Practices
@@ -163,15 +135,13 @@ client.delete_invitation(
    - Use the most restrictive role that still allows users to do their work
 
 2. **Invitation Management**
-   - Set appropriate expiration times for invitation links
-   - Regularly clean up unused invitation links
    - Use email invitations for direct user invites
    - Use invitation links for broader sharing needs
+   - Regularly review and clean up invitations
 
 3. **Security Considerations**
    - Regularly audit space access and permissions
    - Remove collaborators who no longer need access
-   - Use time-limited invitation links when possible
    - Monitor space activity for unusual patterns
 
 ## Error Handling
@@ -182,7 +152,7 @@ Handle potential errors when managing spaces:
 from teable.exceptions import TeableError, ValidationError, AuthenticationError
 
 try:
-    space = client.create_space("New Space")
+    space = client.spaces.create(name="New Space")
 except ValidationError as e:
     print(f"Invalid space name: {e}")
 except AuthenticationError as e:

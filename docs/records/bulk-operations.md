@@ -1,6 +1,6 @@
 # Bulk Record Operations
 
-This guide covers how to perform bulk operations on records in Teable tables, including batch creation, updates, and deletions.
+This guide covers how to perform bulk operations on records in Teable tables.
 
 ## Batch Record Creation
 
@@ -14,9 +14,6 @@ client = TeableClient(TeableConfig(
     api_url="https://your-teable-instance.com/api",
     api_key="your-api-key"
 ))
-
-# Get your table
-table = client.get_table("table_id")
 
 # Prepare multiple records
 records = [
@@ -33,27 +30,27 @@ records = [
 ]
 
 # Batch create records
-result = table.batch_create_records(
-    records=records,
-    field_key_type="name",  # Use field names instead of IDs
-    typecast=True          # Automatically convert data types
+result = client.records.batch_create_records(
+    table_id="table_id",
+    records=records
 )
 
-print(f"Successfully created {result.success_count} records")
-print(f"Failed to create {result.failure_count} records")
+print(f"Successfully created: {result.success_count}")
+print(f"Failed to create: {result.failure_count}")
+print(f"Success rate: {result.success_rate}%")
 ```
 
-### Handling Batch Results
+### Processing Results
 
 ```python
-# Process batch creation results
+# Process successful records
 for record in result.successful:
     print(f"Created record: {record.record_id}")
     print(f"Fields: {record.fields}")
 
-for error in result.failed:
-    print(f"Failed record: {error['record']}")
-    print(f"Error: {error['error']}")
+# Process failed records
+for failure in result.failed:
+    print(f"Failed record: {failure}")
 ```
 
 ## Batch Record Updates
@@ -62,16 +59,16 @@ for error in result.failed:
 
 ```python
 # Prepare updates
-updates = [
+records = [
     {
-        "recordId": "rec123",
+        "record_id": "rec123",
         "fields": {
             "Status": "Active",
             "Department": "Engineering"
         }
     },
     {
-        "recordId": "rec456",
+        "record_id": "rec456",
         "fields": {
             "Status": "Inactive",
             "Department": "Marketing"
@@ -80,27 +77,14 @@ updates = [
 ]
 
 # Perform batch update
-result = table.batch_update_records(
-    updates=updates,
-    field_key_type="name",
-    typecast=True
+result = client.records.batch_update_records(
+    table_id="table_id",
+    records=records
 )
 
-print(f"Updated {len(result.successful)} records")
-```
-
-### Ordering Updates
-
-```python
-# Update records with specific order
-result = table.batch_update_records(
-    updates=updates,
-    order={
-        "viewId": "view123",
-        "anchorId": "rec789",
-        "position": "after"
-    }
-)
+print(f"Successfully updated: {result.success_count}")
+print(f"Failed to update: {result.failure_count}")
+print(f"Success rate: {result.success_rate}%")
 ```
 
 ## Batch Record Deletion
@@ -110,76 +94,14 @@ result = table.batch_update_records(
 ```python
 # Delete multiple records
 record_ids = ["rec123", "rec456", "rec789"]
-success = table.batch_delete_records(record_ids)
+
+success = client.records.batch_delete_records(
+    table_id="table_id",
+    record_ids=record_ids
+)
 
 if success:
     print(f"Successfully deleted {len(record_ids)} records")
-```
-
-## Performance Optimization
-
-### Chunked Operations
-
-```python
-def process_in_chunks(records, chunk_size=1000):
-    """Process records in chunks to manage memory and API limits."""
-    for i in range(0, len(records), chunk_size):
-        chunk = records[i:i + chunk_size]
-        yield chunk
-
-# Example usage with large dataset
-large_dataset = [
-    {"Name": f"User {i}", "Email": f"user{i}@example.com"}
-    for i in range(10000)
-]
-
-total_success = 0
-total_failure = 0
-
-for chunk in process_in_chunks(large_dataset):
-    result = table.batch_create_records(chunk)
-    total_success += result.success_count
-    total_failure += result.failure_count
-    print(f"Processed chunk: {result.success_count} successful, {result.failure_count} failed")
-
-print(f"Total: {total_success} successful, {total_failure} failed")
-```
-
-### Error Recovery
-
-```python
-def batch_operation_with_retry(table, records, max_retries=3):
-    """Perform batch operation with retry for failed records."""
-    all_results = {
-        'successful': [],
-        'failed': []
-    }
-    
-    remaining = records
-    retry_count = 0
-    
-    while remaining and retry_count < max_retries:
-        result = table.batch_create_records(remaining)
-        
-        # Add successful records to results
-        all_results['successful'].extend(result.successful)
-        
-        # Prepare failed records for retry
-        if result.failed:
-            remaining = [
-                failed['record']
-                for failed in result.failed
-            ]
-            retry_count += 1
-            print(f"Retry {retry_count}: {len(remaining)} records")
-        else:
-            remaining = []
-    
-    # Add any remaining failed records
-    if remaining:
-        all_results['failed'].extend(remaining)
-    
-    return all_results
 ```
 
 ## Data Validation
@@ -187,14 +109,17 @@ def batch_operation_with_retry(table, records, max_retries=3):
 ### Pre-validation
 
 ```python
-def validate_records(table, records):
+def validate_records(client, table_id, records):
     """Validate records before batch operation."""
+    # Get table for validation
+    table = client.tables.get(table_id)
+    
     valid_records = []
     invalid_records = []
     
     for record in records:
         try:
-            table.validate_record_fields(record)
+            table.validate_record_fields(record['fields'])
             valid_records.append(record)
         except ValidationError as e:
             invalid_records.append({
@@ -205,9 +130,31 @@ def validate_records(table, records):
     return valid_records, invalid_records
 
 # Usage
-valid, invalid = validate_records(table, records)
+records = [
+    {
+        "fields": {
+            "Name": "John Doe",
+            "Email": "john@example.com"
+        }
+    },
+    {
+        "fields": {
+            "Name": "Jane Smith",
+            "Email": "invalid-email"  # Invalid email
+        }
+    }
+]
+
+valid, invalid = validate_records(client, "table_id", records)
+
+# Create valid records
 if valid:
-    result = table.batch_create_records(valid)
+    result = client.records.batch_create_records(
+        table_id="table_id",
+        records=valid
+    )
+
+# Log invalid records
 if invalid:
     print("Invalid records:")
     for item in invalid:
@@ -218,28 +165,28 @@ if invalid:
 ## Best Practices
 
 1. **Batch Size**
-   - Use appropriate chunk sizes (500-1000 records)
-   - Monitor memory usage
+   - Use reasonable batch sizes
    - Consider API rate limits
-   - Balance performance and reliability
+   - Monitor performance
+   - Handle failures appropriately
 
 2. **Error Handling**
-   - Implement retry mechanisms
+   - Validate data before operations
+   - Handle validation errors
    - Log failed operations
    - Provide meaningful error messages
-   - Consider partial success scenarios
 
 3. **Performance**
-   - Use chunked operations
-   - Implement parallel processing when appropriate
+   - Use batch operations for multiple records
    - Monitor operation timing
+   - Consider rate limits
    - Optimize data preparation
 
 4. **Data Integrity**
    - Validate data before operations
    - Maintain referential integrity
    - Handle duplicates appropriately
-   - Consider transaction boundaries
+   - Back up important data
 
 ## Next Steps
 

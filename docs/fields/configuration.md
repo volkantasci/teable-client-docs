@@ -1,13 +1,13 @@
 # Field Configuration
 
-This guide covers how to configure fields in Teable tables, including field types, options, and advanced settings.
+This guide covers how to configure fields in Teable tables, including field types and options.
 
 ## Field Types
 
 ### Basic Field Types
 
 ```python
-from teable import TeableClient, TeableConfig
+from teable import TeableClient, TeableConfig, FieldType
 
 # Initialize the client
 client = TeableClient(TeableConfig(
@@ -16,272 +16,205 @@ client = TeableClient(TeableConfig(
 ))
 
 # Get your table
-table = client.get_table("table_id")
+table = client.tables.get("table_id")
 
-# Text Fields
-text_field = {
-    "name": "Description",
-    "type": "text",
-    "options": {
-        "multiline": True,
-        "defaultValue": ""
-    }
-}
+# Single Line Text Field
+text_field = client.fields.create(
+    table_id=table.table_id,
+    name="Description",
+    field_type=FieldType.SINGLE_LINE_TEXT,
+    is_required=True
+)
 
-# Number Fields
-number_field = {
-    "name": "Amount",
-    "type": "number",
-    "options": {
+# Long Text Field
+long_text_field = client.fields.create(
+    table_id=table.table_id,
+    name="Details",
+    field_type=FieldType.LONG_TEXT
+)
+
+# Number Field
+number_field = client.fields.create(
+    table_id=table.table_id,
+    name="Amount",
+    field_type=FieldType.NUMBER,
+    options={
         "precision": 2,
-        "format": "currency",
-        "symbol": "$"
+        "format": "currency"
     }
-}
+)
 
-# Date Fields
-date_field = {
-    "name": "Due Date",
-    "type": "date",
-    "options": {
+# Date Field
+date_field = client.fields.create(
+    table_id=table.table_id,
+    name="Due Date",
+    field_type=FieldType.DATE,
+    options={
         "format": "YYYY-MM-DD",
-        "includeTime": True,
-        "timeFormat": "24hour"
+        "include_time": True
     }
-}
+)
 ```
 
 ### Selection Fields
 
 ```python
-# Single Select
-single_select = {
-    "name": "Status",
-    "type": "single_select",
-    "options": {
-        "choices": [
-            {"name": "Active", "color": "green"},
-            {"name": "Pending", "color": "yellow"},
-            {"name": "Completed", "color": "blue"}
-        ]
+# Single Select Field
+single_select = client.fields.create(
+    table_id=table.table_id,
+    name="Status",
+    field_type=FieldType.SINGLE_SELECT,
+    options={
+        "choices": ["Active", "Pending", "Completed"]
     }
-}
+)
 
-# Multiple Select
-multi_select = {
-    "name": "Tags",
-    "type": "multiple_select",
-    "options": {
-        "choices": [
-            {"name": "Urgent", "color": "red"},
-            {"name": "Important", "color": "orange"},
-            {"name": "Review", "color": "purple"}
-        ]
+# Multiple Select Field
+multi_select = client.fields.create(
+    table_id=table.table_id,
+    name="Tags",
+    field_type=FieldType.MULTIPLE_SELECT,
+    options={
+        "choices": ["Urgent", "Important", "Review"]
     }
-}
+)
 ```
 
 ### Special Field Types
 
 ```python
-# Attachment Field
-attachment_field = {
-    "name": "Files",
-    "type": "attachment",
-    "options": {
-        "maxSize": 10485760,  # 10MB
-        "allowedTypes": ["image/*", "application/pdf"]
-    }
-}
+# Checkbox Field
+checkbox_field = client.fields.create(
+    table_id=table.table_id,
+    name="Is Active",
+    field_type=FieldType.CHECKBOX
+)
 
-# Link Field
-link_field = {
-    "name": "Project Manager",
-    "type": "link",
-    "options": {
-        "relationship": "many_to_one",
-        "foreignTableId": "employees_table_id",
-        "symmetricFieldId": "managed_projects"
-    }
-}
+# Rating Field
+rating_field = client.fields.create(
+    table_id=table.table_id,
+    name="Priority",
+    field_type=FieldType.RATING
+)
 
-# Formula Field
-formula_field = {
-    "name": "Total",
-    "type": "formula",
-    "options": {
-        "expression": "{Quantity} * {Price}",
-        "valueType": "number"
-    }
-}
-```
+# Duration Field
+duration_field = client.fields.create(
+    table_id=table.table_id,
+    name="Time Spent",
+    field_type=FieldType.DURATION
+)
 
-## Field Creation
-
-### Creating Fields
-
-```python
-# Create a single field
-field = table.create_field(text_field)
-
-# Create multiple fields
-fields = [
-    text_field,
-    number_field,
-    date_field,
-    single_select
-]
-
-for field_config in fields:
-    field = table.create_field(field_config)
-    print(f"Created field: {field.name}")
-```
-
-### Field Options
-
-```python
-# Text Field Options
-text_options = {
-    "multiline": True,        # Allow multiple lines
-    "defaultValue": "",       # Default value
-    "maxLength": 1000,        # Maximum length
-    "unique": False,          # Unique values only
-    "required": True         # Required field
-}
-
-# Number Field Options
-number_options = {
-    "precision": 2,           # Decimal places
-    "format": "decimal",      # number format
-    "minimum": 0,            # Minimum value
-    "maximum": 1000,         # Maximum value
-    "allowNegative": False   # Allow negative values
-}
-
-# Date Field Options
-date_options = {
-    "includeTime": True,     # Include time component
-    "timeFormat": "12hour",  # 12/24 hour format
-    "defaultValue": "now",   # Default to current time
-    "timezone": "UTC"       # Timezone handling
-}
+# Button Field
+button_field = client.fields.create(
+    table_id=table.table_id,
+    name="Action",
+    field_type=FieldType.BUTTON
+)
 ```
 
 ## Field Management
+
+### Getting Field Information
+
+```python
+# Get field from table
+field = table.get_field("field_id")
+
+# Access field properties
+print(f"Field ID: {field.field_id}")
+print(f"Type: {field.field_type}")
+print(f"Required: {field.is_required}")
+print(f"Primary: {field.is_primary}")
+print(f"Computed: {field.is_computed}")
+```
 
 ### Updating Fields
 
 ```python
 # Update field configuration
-field.update({
-    "name": "New Name",
-    "description": "Updated description",
-    "options": {
-        "required": True,
-        "unique": True
+field = client.fields.update(
+    field_id="field_id",
+    name="New Name",
+    is_required=True,
+    options={
+        "choices": ["Option 1", "Option 2", "Option 3"]  # For select fields
     }
-})
+)
 ```
 
-### Field Properties
+## Field Types Reference
+
+### Available Field Types
 
 ```python
-# Access field properties
-print(f"Field ID: {field.field_id}")
-print(f"Name: {field.name}")
-print(f"Type: {field.field_type}")
-print(f"Description: {field.description}")
-print(f"Required: {field.is_required}")
-print(f"Primary: {field.is_primary}")
-```
+from teable import FieldType
 
-## Advanced Configuration
+# Text Fields
+FieldType.SINGLE_LINE_TEXT    # Single line text
+FieldType.LONG_TEXT          # Multi-line text
 
-### Computed Fields
+# Number Fields
+FieldType.NUMBER            # Numeric values
 
-```python
-# Lookup Field
-lookup_field = {
-    "name": "Manager Email",
-    "type": "lookup",
-    "options": {
-        "relationship": "many_to_one",
-        "foreignTableId": "employees_table_id",
-        "lookupFieldId": "email_field_id"
-    }
-}
+# Date Fields
+FieldType.DATE              # Date and time
 
-# Rollup Field
-rollup_field = {
-    "name": "Total Sales",
-    "type": "rollup",
-    "options": {
-        "relationship": "one_to_many",
-        "foreignTableId": "sales_table_id",
-        "rollupFunction": "sum",
-        "field": "amount_field_id"
-    }
-}
-```
+# Selection Fields
+FieldType.SINGLE_SELECT     # Single choice
+FieldType.MULTIPLE_SELECT   # Multiple choices
 
-### Field Dependencies
+# Special Fields
+FieldType.CHECKBOX          # Boolean values
+FieldType.RATING           # Rating values
+FieldType.DURATION         # Time duration
+FieldType.BUTTON           # Button field
 
-```python
-# Create dependent fields
-status_field = {
-    "name": "Status",
-    "type": "single_select",
-    "options": {
-        "choices": [
-            {"name": "Active"},
-            {"name": "Inactive"}
-        ]
-    }
-}
-
-dependent_field = {
-    "name": "Next Action",
-    "type": "single_select",
-    "options": {
-        "choices": [
-            {"name": "Follow up"},
-            {"name": "Archive"}
-        ],
-        "dependsOn": {
-            "field": "Status",
-            "condition": {
-                "equals": "Active"
-            }
-        }
-    }
-}
+# System Fields
+FieldType.CREATED_TIME     # Record creation time
+FieldType.LAST_MODIFIED_TIME  # Last modification time
+FieldType.CREATED_BY       # Record creator
+FieldType.LAST_MODIFIED_BY  # Last modifier
+FieldType.AUTO_NUMBER      # Auto-incrementing number
 ```
 
 ## Best Practices
 
 1. **Field Design**
-   - Use appropriate field types
-   - Set meaningful defaults
-   - Consider data validation
+   - Choose appropriate field types for your data
+   - Use clear, descriptive field names
+   - Set required fields appropriately
    - Document field purposes
 
-2. **Performance**
-   - Optimize computed fields
-   - Use appropriate indexes
-   - Consider query performance
-   - Monitor field usage
+2. **Field Options**
+   - Configure field options based on data requirements
+   - Use appropriate formats for numbers and dates
+   - Set meaningful choices for select fields
+   - Consider validation requirements
 
-3. **Data Integrity**
-   - Validate field dependencies
-   - Maintain referential integrity
-   - Handle default values
-   - Consider data migration
-
-4. **Maintenance**
-   - Regular field audits
-   - Update field documentation
+3. **Field Management**
+   - Regularly review field configurations
+   - Update field settings as needed
    - Monitor field usage
    - Clean up unused fields
+
+## Error Handling
+
+```python
+from teable.exceptions import TeableError, ValidationError
+
+try:
+    # Create a field
+    field = client.fields.create(
+        table_id="table_id",
+        name="New Field",
+        field_type=FieldType.SINGLE_LINE_TEXT,
+        is_required=True
+    )
+except ValidationError as e:
+    print(f"Invalid field configuration: {e}")
+except TeableError as e:
+    print(f"Error creating field: {e}")
+```
 
 ## Next Steps
 

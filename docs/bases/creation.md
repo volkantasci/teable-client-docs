@@ -6,8 +6,6 @@ A base in Teable is a container for tables and other resources within a space. T
 
 ### Basic Base Creation
 
-The simplest way to create a base is within a space:
-
 ```python
 from teable import TeableClient, TeableConfig
 
@@ -18,7 +16,7 @@ client = TeableClient(TeableConfig(
 ))
 
 # Create a base in a space
-base = client.create_base(
+base = client.tables.create(
     space_id="space123",
     name="Project Tracker",
     icon="📊"  # Optional emoji or icon identifier
@@ -27,28 +25,13 @@ base = client.create_base(
 print(f"Created base: {base.name} (ID: {base.base_id})")
 ```
 
-### Creating from a Space Instance
-
-You can also create a base directly from a space instance:
-
-```python
-# Get a space
-space = client.get_space("space123")
-
-# Create a base in this space
-base = space.create_base(
-    name="Customer Database",
-    icon="👥"
-)
-```
-
 ## Duplicating Bases
 
 You can create a copy of an existing base:
 
 ```python
 # Duplicate a base
-duplicated_base = client.duplicate_base(
+duplicated_base = client.tables.duplicate(
     from_base_id="base123",
     space_id="space123",
     name="Project Tracker Copy",
@@ -56,42 +39,13 @@ duplicated_base = client.duplicate_base(
 )
 ```
 
-Or duplicate from a base instance:
-
-```python
-# Get an existing base
-base = client.get_base("base123")
-
-# Create a duplicate
-duplicate = base.duplicate(
-    space_id="space123",
-    name="Project Tracker - Development",
-    with_records=False  # Start with empty tables
-)
-```
-
-## Creating from Templates
-
-You can create a new base from an existing template:
-
-```python
-# Create a base from a template
-base = client.create_base_from_template(
-    space_id="space123",
-    template_id="template123",
-    with_records=True  # Include template records
-)
-```
-
 ## Base Configuration
 
 ### Updating Base Information
 
-You can update a base's name and icon:
-
 ```python
 # Get a base
-base = client.get_base("base123")
+base = client.tables.get("base123")
 
 # Update base information
 updated_base = base.update(
@@ -183,13 +137,9 @@ base.delete_collaborator(
 ```python
 # Create an invitation link
 invitation = base.create_invitation_link(role="editor")
-print(f"Invitation URL: {invitation.invite_url}")
 
 # List all invitation links
 invitations = base.get_invitation_links()
-for inv in invitations:
-    print(f"ID: {inv.invitation_id}")
-    print(f"Role: {inv.role}")
 ```
 
 ### Sending Email Invitations
@@ -201,9 +151,6 @@ result = base.send_email_invitations(
     emails=emails,
     role="editor"
 )
-
-for email, info in result.items():
-    print(f"Invited {email}: {info['invitationId']}")
 ```
 
 ## Base Deletion
@@ -242,7 +189,6 @@ base.delete_permanent()
 3. **Data Management**
    - Consider whether to include records when duplicating
    - Back up important bases before major changes
-   - Use templates for standardized base structures
    - Maintain consistent naming conventions
 
 ## Error Handling
@@ -251,7 +197,7 @@ base.delete_permanent()
 from teable.exceptions import TeableError, ValidationError
 
 try:
-    base = client.create_base(
+    base = client.tables.create(
         space_id="space123",
         name="New Project"
     )

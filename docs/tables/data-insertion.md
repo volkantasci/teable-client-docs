@@ -1,6 +1,6 @@
 # Data Insertion and Record Creation
 
-This guide covers how to insert data and create records in Teable tables using the Teable-Client library. Learn about single record creation, batch operations, and data validation.
+This guide covers how to insert data and create records in Teable tables using the Teable-Client library.
 
 ## Single Record Creation
 
@@ -15,18 +15,18 @@ client = TeableClient(TeableConfig(
     api_key="your-api-key"
 ))
 
-# Get your table
-table = client.get_table("table_id")
-
 # Create a single record
-record = table.create_record({
-    "Name": "John Doe",
-    "Email": "john@example.com",
-    "Department": "Engineering",
-    "Start Date": "2023-01-15"
-})
+record = client.records.create(
+    table_id="table_id",
+    fields={
+        "Name": "John Doe",
+        "Email": "john@example.com",
+        "Department": "Engineering",
+        "Start Date": "2023-01-15"
+    }
+)
 
-print(f"Created record ID: {record.id}")
+print(f"Created record ID: {record.record_id}")
 ```
 
 ### Record Creation with Validation
@@ -35,13 +35,25 @@ print(f"Created record ID: {record.id}")
 from teable.exceptions import ValidationError
 
 try:
-    # Create record with validation
-    record = table.create_record({
+    # Get table for validation
+    table = client.tables.get("table_id")
+    
+    # Prepare record data
+    data = {
         "Name": "Jane Smith",
         "Email": "jane@example.com",
         "Salary": 75000,
         "Active": True
-    })
+    }
+    
+    # Validate data
+    table.validate_record_fields(data)
+    
+    # Create record
+    record = client.records.create(
+        table_id=table.table_id,
+        fields=data
+    )
 except ValidationError as e:
     print(f"Validation error: {e}")
 ```
@@ -71,57 +83,22 @@ records = [
 ]
 
 # Batch create records
-result = table.batch_create_records(
-    records=records,
-    field_key_type="name",  # Use field names instead of IDs
-    typecast=True  # Automatically convert data types
+result = client.records.batch_create_records(
+    table_id="table_id",
+    records=records
 )
 
-print(f"Successfully created {result.success_count} records")
-```
+print(f"Successfully created: {result.success_count}")
+print(f"Failed to create: {result.failure_count}")
+print(f"Success rate: {result.success_rate}%")
 
-### Batch Creation with Order
+# Process successful records
+for record in result.successful:
+    print(f"Created record: {record.record_id}")
 
-```python
-# Create records with specific order
-result = table.batch_create_records(
-    records=records,
-    order={
-        "viewId": "view123",
-        "anchorId": "record123",
-        "position": "after"
-    }
-)
-```
-
-## Advanced Data Insertion
-
-### Type Casting
-
-```python
-# Create record with automatic type casting
-record = table.create_record(
-    fields={
-        "Name": "David Lee",
-        "Hire Date": "2023-01-15",  # String date will be converted
-        "Salary": "75000",          # String number will be converted
-        "Active": "true"            # String boolean will be converted
-    },
-    typecast=True
-)
-```
-
-### Field Key Types
-
-```python
-# Using field IDs instead of names
-record = table.create_record(
-    fields={
-        "fld123": "David Lee",      # Field ID for Name
-        "fld456": "david@example.com"  # Field ID for Email
-    },
-    field_key_type="id"
-)
+# Process failed records
+for failure in result.failed:
+    print(f"Failed record: {failure}")
 ```
 
 ## Validation and Error Handling
@@ -130,6 +107,9 @@ record = table.create_record(
 
 ```python
 try:
+    # Get table for validation
+    table = client.tables.get("table_id")
+    
     # Validate fields before creation
     table.validate_record_fields({
         "Name": "Test User",
@@ -146,69 +126,26 @@ except ValidationError as e:
 from teable.exceptions import TeableError
 
 try:
-    # Attempt batch creation
+    # Prepare records
     records = [
         {"Name": "User 1", "Email": "valid@example.com"},
         {"Name": "User 2", "Email": "invalid-email"},
         {"Name": "User 3", "Email": "another@example.com"}
     ]
     
-    result = table.batch_create_records(records)
+    # Attempt batch creation
+    result = client.records.batch_create_records(
+        table_id="table_id",
+        records=records
+    )
     
-    # Check for partial success
-    print(f"Successful: {result.success_count}")
-    print(f"Failed: {result.failure_count}")
+    # Check results
+    print(f"Successfully created: {result.success_count}")
+    print(f"Failed to create: {result.failure_count}")
+    print(f"Success rate: {result.success_rate}%")
     
-    # Handle failed records
-    for error in result.errors:
-        print(f"Error in record {error.index}: {error.message}")
-        
 except TeableError as e:
     print(f"Batch operation failed: {e}")
-```
-
-## Performance Optimization
-
-### Chunked Batch Operations
-
-```python
-def create_records_in_chunks(table, records, chunk_size=1000):
-    """Create records in chunks to handle large datasets."""
-    for i in range(0, len(records), chunk_size):
-        chunk = records[i:i + chunk_size]
-        result = table.batch_create_records(chunk)
-        print(f"Processed chunk {i//chunk_size + 1}: {result.success_count} successful")
-```
-
-### Efficient Data Preparation
-
-```python
-# Prepare data efficiently for batch insertion
-from typing import List, Dict, Any
-
-def prepare_records(data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """Prepare records for batch insertion with validation."""
-    prepared_records = []
-    
-    for item in data:
-        # Basic data cleaning
-        record = {
-            k: v.strip() if isinstance(v, str) else v
-            for k, v in item.items()
-            if v is not None
-        }
-        
-        # Add any default values
-        record.setdefault("Status", "Active")
-        
-        prepared_records.append(record)
-    
-    return prepared_records
-
-# Use the prepared data
-raw_data = [{"Name": "User 1 "}, {"Name": "User 2 "}]  # Note trailing spaces
-records = prepare_records(raw_data)
-result = table.batch_create_records(records)
 ```
 
 ## Best Practices
@@ -221,35 +158,41 @@ result = table.batch_create_records(records)
 
 2. **Batch Operations**
    - Use batch operations for multiple records
-   - Process large datasets in chunks
    - Handle partial failures appropriately
    - Monitor performance
+   - Consider rate limits
 
 3. **Error Handling**
    - Implement comprehensive error handling
    - Log validation failures
    - Provide meaningful error messages
-   - Handle retries for transient failures
+   - Handle errors appropriately
 
 4. **Performance**
-   - Use appropriate chunk sizes
-   - Minimize API calls
+   - Use batch operations when possible
+   - Monitor API usage
    - Prepare data efficiently
-   - Monitor memory usage
+   - Consider rate limits
 
 ## Error Handling Examples
 
 ```python
 from teable.exceptions import TeableError, ValidationError, ResourceNotFoundError
 
-def safe_create_record(table, data):
+def safe_create_record(client, table_id, data):
     """Safely create a record with error handling."""
     try:
+        # Get table for validation
+        table = client.tables.get(table_id)
+        
         # Validate first
         table.validate_record_fields(data)
         
         # Create record
-        record = table.create_record(data)
+        record = client.records.create(
+            table_id=table_id,
+            fields=data
+        )
         return record
         
     except ValidationError as e:

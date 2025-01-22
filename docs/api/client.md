@@ -4,7 +4,7 @@ This document provides detailed API reference for the TeableClient class, which 
 
 ## TeableClient
 
-The TeableClient class provides the primary interface for interacting with Teable services.
+The TeableClient class provides the primary interface for interacting with Teable services through various specialized managers.
 
 ### Constructor
 
@@ -29,132 +29,49 @@ The `TeableConfig` class accepts the following parameters:
 | api_key | str | Yes | Your API key for authentication |
 | timeout | int | No | Request timeout in seconds (default: 30) |
 | max_retries | int | No | Maximum number of retry attempts (default: 3) |
-| cache_enabled | bool | No | Enable response caching (default: True) |
 
-## Space Operations
+## Available Managers
 
-### Get Spaces
+The TeableClient provides access to various specialized managers for different aspects of the API:
 
-Retrieve all accessible spaces.
+### Space Operations (client.spaces)
 
 ```python
-spaces = client.get_spaces()
+# Get all spaces
+spaces = client.spaces.get_all()
+
+# Get a specific space
+space = client.spaces.get("space_id")
+
+# Create a new space
+space = client.spaces.create(name="My New Space")
 ```
 
-Returns: `List[Space]`
-
-### Get Space
-
-Get a specific space by ID.
+### Base Operations (client.tables)
 
 ```python
-space = client.get_space("space_id")
-```
+# Get all bases
+bases = client.tables.get_all()
 
-Parameters:
-- space_id (str): The ID of the space to retrieve
+# Get a specific base
+base = client.tables.get("base_id")
 
-Returns: `Space`
-
-### Create Space
-
-Create a new space.
-
-```python
-space = client.create_space("My New Space")
-```
-
-Parameters:
-- name (str): The name for the new space
-
-Returns: `Space`
-
-## Base Operations
-
-### Get Bases
-
-Retrieve all accessible bases.
-
-```python
-bases = client.get_bases()
-```
-
-Returns: `List[Base]`
-
-### Get Base
-
-Get a specific base by ID.
-
-```python
-base = client.get_base("base_id")
-```
-
-Parameters:
-- base_id (str): The ID of the base to retrieve
-
-Returns: `Base`
-
-### Create Base
-
-Create a new base in a space.
-
-```python
-base = client.create_base(
+# Create a new base
+base = client.tables.create(
     space_id="space_id",
     name="My New Base",
     icon="📊"  # Optional
 )
 ```
 
-Parameters:
-- space_id (str): The ID of the space to create the base in
-- name (str, optional): The name for the new base
-- icon (str, optional): An emoji or icon identifier
-
-Returns: `Base`
-
-### Duplicate Base
-
-Create a copy of an existing base.
+### Table Operations (client.tables)
 
 ```python
-base = client.duplicate_base(
-    from_base_id="source_base_id",
-    space_id="target_space_id",
-    name="Duplicated Base",
-    with_records=True
-)
-```
+# Get a specific table
+table = client.tables.get("table_id")
 
-Parameters:
-- from_base_id (str): The ID of the base to duplicate
-- space_id (str): The ID of the space to create the duplicate in
-- name (str, optional): The name for the duplicated base
-- with_records (bool): Whether to include records in the duplicate
-
-Returns: `Base`
-
-## Table Operations
-
-### Get Table
-
-Get a specific table by ID.
-
-```python
-table = client.get_table("table_id")
-```
-
-Parameters:
-- table_id (str): The ID of the table to retrieve
-
-Returns: `Table`
-
-### Create Table
-
-Create a new table in a base.
-
-```python
-table = client.create_table(
+# Create a new table
+table = client.tables.create(
     base_id="base_id",
     name="My New Table",
     description="Table description",
@@ -172,41 +89,17 @@ table = client.create_table(
 )
 ```
 
-Parameters:
-- base_id (str): The ID of the base to create the table in
-- name (str): The name for the new table
-- description (str, optional): A description of the table
-- fields (List[Dict], optional): Field definitions for the table
-
-Returns: `Table`
-
-## Record Operations
-
-### Get Record
-
-Get a specific record by ID.
+### Record Operations (client.records)
 
 ```python
-record = client.get_record(
+# Get a specific record
+record = client.records.get(
     table_id="table_id",
-    record_id="record_id",
-    cell_format="json"
+    record_id="record_id"
 )
-```
 
-Parameters:
-- table_id (str): The ID of the table containing the record
-- record_id (str): The ID of the record to retrieve
-- cell_format (str, optional): Format for cell values ('json' or 'text')
-
-Returns: `Record`
-
-### Create Record
-
-Create a new record in a table.
-
-```python
-record = client.create_record(
+# Create a new record
+record = client.records.create(
     table_id="table_id",
     fields={
         "Name": "John Doe",
@@ -215,11 +108,112 @@ record = client.create_record(
 )
 ```
 
-Parameters:
-- table_id (str): The ID of the table to create the record in
-- fields (Dict): The field values for the new record
+### Field Operations (client.fields)
 
-Returns: `Record`
+```python
+# Get field information
+field = client.fields.get("field_id")
+
+# Create a new field
+field = client.fields.create(
+    table_id="table_id",
+    name="New Field",
+    type="text"
+)
+```
+
+### View Operations (client.views)
+
+```python
+# Get view information
+view = client.views.get("view_id")
+
+# Create a new view
+view = client.views.create(
+    table_id="table_id",
+    name="New View",
+    type="grid"
+)
+```
+
+### Attachment Operations (client.attachments)
+
+```python
+# Upload an attachment
+attachment = client.attachments.upload(file_path="path/to/file")
+
+# Get attachment information
+attachment = client.attachments.get("attachment_id")
+```
+
+### Selection Operations (client.selection)
+
+```python
+# Create a selection
+selection = client.selection.create(
+    table_id="table_id",
+    record_ids=["record1", "record2"]
+)
+```
+
+### Notification Operations (client.notifications)
+
+```python
+# Get notifications
+notifications = client.notifications.get_all()
+
+# Mark notification as read
+client.notifications.mark_read("notification_id")
+```
+
+### Organization Operations (client.organizations)
+
+```python
+# Get organization information
+org = client.organizations.get("org_id")
+
+# Update organization settings
+client.organizations.update("org_id", settings={})
+```
+
+### AI Operations (client.ai)
+
+```python
+# Generate content using AI
+result = client.ai.generate(prompt="Your prompt here")
+```
+
+### Plugin Operations (client.plugins)
+
+```python
+# Get installed plugins
+plugins = client.plugins.get_all()
+
+# Install a plugin
+client.plugins.install("plugin_id")
+```
+
+### Comment Operations (client.comments)
+
+```python
+# Add a comment
+comment = client.comments.create(
+    record_id="record_id",
+    content="Comment text"
+)
+
+# Get comments
+comments = client.comments.get_all(record_id="record_id")
+```
+
+### Cache Management
+
+The client maintains caches for various resources to improve performance. You can clear these caches when needed:
+
+```python
+# Clear all caches
+client.clear_cache()
+```
 
 ## Error Handling
 
@@ -238,7 +232,7 @@ Example error handling:
 from teable.exceptions import TeableError, ValidationError
 
 try:
-    record = client.create_record(table_id, fields)
+    record = client.records.create(table_id, fields)
 except ValidationError as e:
     print(f"Invalid data: {e}")
 except TeableError as e:

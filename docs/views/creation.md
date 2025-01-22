@@ -1,6 +1,6 @@
 # Creating and Managing Views
 
-This guide covers how to create and manage views in Teable tables. Views provide different ways to visualize and interact with your table data.
+This guide covers how to create and manage views in Teable tables.
 
 ## Creating Views
 
@@ -15,53 +15,14 @@ client = TeableClient(TeableConfig(
     api_key="your-api-key"
 ))
 
-# Get your table
-table = client.get_table("table_id")
-
-# Create a basic grid view
-view = table.create_view({
-    "name": "My Grid View",
-    "type": "grid"
-})
+# Create a grid view
+view = client.views.create(
+    table_id="table_id",
+    name="My Grid View",
+    type="grid"
+)
 
 print(f"Created view: {view.view_id}")
-```
-
-### View Types
-
-```python
-# Grid View
-grid_view = table.create_view({
-    "name": "Grid View",
-    "type": "grid"
-})
-
-# Calendar View
-calendar_view = table.create_view({
-    "name": "Calendar View",
-    "type": "calendar",
-    "options": {
-        "dateField": "due_date"  # Field to use for calendar
-    }
-})
-
-# Kanban View
-kanban_view = table.create_view({
-    "name": "Project Status",
-    "type": "kanban",
-    "options": {
-        "groupField": "status"  # Field to group by
-    }
-})
-
-# Gallery View
-gallery_view = table.create_view({
-    "name": "Image Gallery",
-    "type": "gallery",
-    "options": {
-        "coverField": "image"  # Field to use as cover
-    }
-})
 ```
 
 ## View Configuration
@@ -69,60 +30,67 @@ gallery_view = table.create_view({
 ### Filtering Records
 
 ```python
+from teable import FilterOperator
+
 # Create view with filters
-view = table.create_view({
-    "name": "Active Projects",
-    "type": "grid",
-    "filter": {
+view = client.views.create(
+    table_id="table_id",
+    name="Active Projects",
+    type="grid",
+    filter={
         "operator": "and",
         "conditions": [
             {
                 "field": "Status",
-                "operator": "=",
+                "operator": FilterOperator.EQUALS,
                 "value": "Active"
             },
             {
                 "field": "Due Date",
-                "operator": ">",
+                "operator": FilterOperator.GREATER_THAN,
                 "value": "2023-01-01"
             }
         ]
     }
-})
+)
 ```
 
 ### Sorting Records
 
 ```python
+from teable import SortDirection
+
 # Create view with sorting
-view = table.create_view({
-    "name": "Projects by Priority",
-    "type": "grid",
-    "sort": [
+view = client.views.create(
+    table_id="table_id",
+    name="Projects by Priority",
+    type="grid",
+    sort=[
         {
             "field": "Priority",
-            "direction": "desc"
+            "direction": SortDirection.DESCENDING
         },
         {
             "field": "Due Date",
-            "direction": "asc"
+            "direction": SortDirection.ASCENDING
         }
     ]
-})
+)
 ```
 
 ### Field Visibility
 
 ```python
 # Create view with specific visible fields
-view = table.create_view({
-    "name": "Simple View",
-    "type": "grid",
-    "fields": {
+view = client.views.create(
+    table_id="table_id",
+    name="Simple View",
+    type="grid",
+    fields={
         "visible": ["Name", "Status", "Due Date"],
         "hidden": ["Internal Notes", "Created By"]
     }
-})
+)
 ```
 
 ## Managing Views
@@ -130,44 +98,40 @@ view = table.create_view({
 ### Getting Views
 
 ```python
+# Get table
+table = client.tables.get("table_id")
+
 # Get all views in a table
 views = table.views
-
-# Get a specific view
-view = table.get_view("view_id")
-
-# Access view properties
-print(f"View Name: {view.name}")
-print(f"View Type: {view.type}")
-print(f"View Filter: {view.filter}")
 ```
 
 ### Updating Views
 
 ```python
+from teable import FilterOperator
+
 # Update view configuration
-view.update({
-    "name": "Updated View Name",
-    "filter": {
+view = client.views.update(
+    view_id="view_id",
+    name="Updated View Name",
+    filter={
         "operator": "and",
         "conditions": [
             {
                 "field": "Status",
-                "operator": "in",
+                "operator": FilterOperator.IN,
                 "value": ["Active", "In Progress"]
             }
         ]
     }
-})
+)
 ```
 
 ### Deleting Views
 
 ```python
 # Delete a view
-success = view.delete()
-if success:
-    print("View deleted successfully")
+client.views.delete(view_id="view_id")
 ```
 
 ## Working with View Data
@@ -176,12 +140,9 @@ if success:
 
 ```python
 # Get records using view's configuration
-records = table.get_records(view_id=view.view_id)
-
-# Get records ignoring view's query
-records = table.get_records(
-    view_id=view.view_id,
-    ignore_view_query=True
+records = client.records.get_records(
+    table_id="table_id",
+    view_id="view_id"
 )
 ```
 
@@ -189,57 +150,12 @@ records = table.get_records(
 
 ```python
 # Get paginated records from a view
-records = table.get_records(
-    view_id=view.view_id,
+records = client.records.get_records(
+    table_id="table_id",
+    view_id="view_id",
     take=50,    # Number of records to return
     skip=100    # Number of records to skip
 )
-```
-
-## View Options
-
-### Grid View Options
-
-```python
-grid_view = table.create_view({
-    "name": "Custom Grid",
-    "type": "grid",
-    "options": {
-        "frozenColumns": 2,      # Number of frozen columns
-        "rowHeight": "medium",   # Row height: "short", "medium", "tall"
-        "showSystemFields": False  # Show/hide system fields
-    }
-})
-```
-
-### Calendar View Options
-
-```python
-calendar_view = table.create_view({
-    "name": "Event Calendar",
-    "type": "calendar",
-    "options": {
-        "dateField": "event_date",
-        "titleField": "event_name",
-        "descriptionField": "details",
-        "colorField": "category"
-    }
-})
-```
-
-### Kanban View Options
-
-```python
-kanban_view = table.create_view({
-    "name": "Task Board",
-    "type": "kanban",
-    "options": {
-        "groupField": "status",
-        "stackField": "assignee",
-        "hideEmptyGroups": True,
-        "cardFields": ["title", "priority", "due_date"]
-    }
-})
 ```
 
 ## Best Practices
@@ -254,13 +170,13 @@ kanban_view = table.create_view({
    - Optimize filters for performance
    - Use appropriate pagination
    - Consider data volume
-   - Cache view configurations
+   - Monitor view usage
 
 3. **User Experience**
-   - Choose appropriate view types
    - Configure meaningful defaults
    - Provide clear field visibility
    - Consider sorting and filtering
+   - Keep views organized
 
 4. **Maintenance**
    - Regular view audits

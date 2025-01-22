@@ -1,6 +1,6 @@
 # Managing Spaces
 
-This guide covers the various operations available for managing spaces in Teable, including listing spaces, retrieving space information, and managing space content.
+This guide covers the various operations available for managing spaces in Teable.
 
 ## Listing Spaces
 
@@ -16,13 +16,11 @@ client = TeableClient(TeableConfig(
 ))
 
 # Get all accessible spaces
-spaces = client.get_spaces()
+spaces = client.spaces.get_all()
 
 # Display space information
 for space in spaces:
     print(f"Space ID: {space.space_id}")
-    print(f"Name: {space.name}")
-    print("---")
 ```
 
 ## Retrieving a Specific Space
@@ -31,10 +29,9 @@ Get detailed information about a specific space:
 
 ```python
 # Get a space by ID
-space = client.get_space("space123")
+space = client.spaces.get("space123")
 
 # Access space properties
-print(f"Space Name: {space.name}")
 print(f"Space ID: {space.space_id}")
 ```
 
@@ -46,136 +43,77 @@ You can retrieve all bases within a space:
 
 ```python
 # Get all bases in a space
-bases = client.get_space_bases("space123")
+bases = client.tables.get_all(space_id="space123")
 
 for base in bases:
-    print(f"Base Name: {base.name}")
-    print(f"Base ID: {base.base_id}")
-    print("---")
+    print(f"Base ID: {base.table_id}")
 ```
-
-### Managing Space Trash
-
-Teable provides trash management capabilities for spaces:
-
-```python
-from teable.models.trash import ResourceType
-
-# List items in space trash
-trash_items = client.get_trash_items(ResourceType.SPACE)
-
-# List trash items for a specific space
-space_trash = client.get_trash_items_for_resource(
-    resource_id="space123",
-    resource_type=ResourceType.SPACE
-)
-
-# Restore an item from trash
-client.restore_trash_item("trash_item_id")
-
-# Permanently delete trash items
-client.reset_trash_items_for_resource(
-    resource_id="space123",
-    resource_type=ResourceType.SPACE
-)
-```
-
-### Permanent Deletion
-
-If needed, you can permanently delete a space:
-
-```python
-try:
-    # Permanently delete a space
-    client.permanently_delete_space("space123")
-    print("Space permanently deleted")
-except TeableError as e:
-    print(f"Error deleting space: {e}")
-```
-
-!!! warning "Warning"
-    Permanent deletion cannot be undone. Make sure to back up any important data before proceeding with permanent deletion.
 
 ## Space Permissions
 
-### Checking Base Permissions
-
-You can check permissions for bases within a space:
+### Managing Collaborators
 
 ```python
-# Get permissions for a base
-permissions = client.get_base_permission("base123")
+from teable import SpaceRole
+from teable.models.collaborator import PrincipalType
 
-# Check specific permissions
-for permission, allowed in permissions.items():
-    print(f"{permission}: {'Allowed' if allowed else 'Not Allowed'}")
-```
+# Get a space
+space = client.spaces.get("space123")
 
-## Advanced Operations
-
-### Database Connections
-
-Teable allows you to manage database connections for bases within a space:
-
-```python
-# Create a database connection
-connection = client.create_db_connection("base123")
-print(f"Connection URL: {connection['url']}")
-
-# Get connection information
-connection_info = client.get_db_connection("base123")
-print(f"Current connections: {connection_info['connection']['current']}")
-print(f"Max connections: {connection_info['connection']['max']}")
-
-# Delete a connection when no longer needed
-client.delete_db_connection("base123")
-```
-
-### Base Ordering
-
-You can manage the order of bases within a space:
-
-```python
-# Update base order
-client.update_base_order(
-    base_id="base123",
-    anchor_id="base456",
-    position="after"  # or "before"
-)
-```
-
-### Querying Bases
-
-Execute SQL queries on bases within a space:
-
-```python
-# Execute a query
-results = client.query_base(
-    base_id="base123",
-    query="SELECT * FROM table_name WHERE column = 'value'",
-    cell_format="json"  # or "text"
+# Get collaborators
+collaborators, total = space.get_collaborators(
+    include_system=True,
+    take=100,
+    search="john"
 )
 
-for row in results:
-    print(row)
+# Add collaborators
+collaborators = [
+    {
+        "principalId": "user123",
+        "principalType": "user"
+    },
+    {
+        "principalId": "dept456",
+        "principalType": "department"
+    }
+]
+
+space.add_collaborators(
+    collaborators=collaborators,
+    role=SpaceRole.EDITOR
+)
+
+# Update collaborator role
+space.update_collaborator(
+    principal_id="user123",
+    principal_type=PrincipalType.USER,
+    role=SpaceRole.EDITOR
+)
+
+# Remove collaborator
+space.delete_collaborator(
+    principal_id="user123",
+    principal_type=PrincipalType.USER
+)
 ```
 
 ## Best Practices
 
 1. **Resource Management**
    - Regularly clean up unused spaces and bases
-   - Use trash management before permanent deletion
-   - Monitor database connections and close unused ones
+   - Monitor space usage
+   - Back up important data
 
-2. **Performance Optimization**
-   - Use pagination when listing large numbers of items
-   - Close database connections when not in use
-   - Use appropriate cell formats when querying data
-
-3. **Organization**
+2. **Organization**
    - Maintain a clear naming convention for spaces
    - Group related bases within the same space
    - Use descriptive names for better searchability
+
+3. **Access Control**
+   - Regularly review collaborator access
+   - Use appropriate roles for different users
+   - Document access policies
 
 ## Error Handling
 
@@ -185,7 +123,7 @@ Implement proper error handling for space management operations:
 from teable.exceptions import TeableError, ResourceNotFoundError
 
 try:
-    space = client.get_space("space123")
+    space = client.spaces.get("space123")
 except ResourceNotFoundError:
     print("Space not found")
 except TeableError as e:

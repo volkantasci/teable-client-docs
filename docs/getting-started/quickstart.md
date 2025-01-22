@@ -17,64 +17,125 @@ config = TeableConfig(
 client = TeableClient(config)
 ```
 
-## Working with Tables
+## Working with Spaces and Bases
 
-### Accessing a Table
+### Managing Spaces
 
 ```python
-# Get a table by ID
-table = client.get_table("table_id")
+# Get all spaces
+spaces = client.spaces.get_all()
+print(f"Found {len(spaces)} spaces")
 
-# List all tables in a base
-base_tables = client.list_tables("base_id")
+# Create a new space
+space = client.spaces.create(name="My New Space")
+print(f"Created space: {space.name}")
+
+# Get a specific space
+space = client.spaces.get("space_id")
 ```
 
-### Creating Records
+### Managing Bases
+
+```python
+# Create a base in a space
+base = client.tables.create(
+    space_id="space_id",
+    name="My New Base"
+)
+print(f"Created base: {base.name}")
+
+# Get a specific base
+base = client.tables.get("base_id")
+```
+
+## Working with Tables
+
+### Managing Tables
+
+```python
+# Create a table in a base
+table = client.tables.create(
+    base_id="base_id",
+    name="Employees",
+    fields=[
+        {
+            "name": "Name",
+            "type": "singleLineText",
+            "required": True
+        },
+        {
+            "name": "Email",
+            "type": "singleLineText"
+        },
+        {
+            "name": "Age",
+            "type": "number"
+        }
+    ]
+)
+print(f"Created table: {table.name}")
+
+# Get a specific table
+table = client.tables.get("table_id")
+```
+
+### Working with Records
 
 ```python
 # Create a single record
-record = table.create_record({
-    "name": "John Doe",
-    "email": "john@example.com",
-    "age": 30
-})
-print(f"Created record ID: {record.id}")
+record = client.records.create(
+    table_id="table_id",
+    fields={
+        "Name": "John Doe",
+        "Email": "john@example.com",
+        "Age": 30
+    }
+)
+print(f"Created record ID: {record.record_id}")
 
 # Batch create multiple records
 records_data = [
-    {"name": "Alice", "age": 28},
-    {"name": "Bob", "age": 32}
+    {"Name": "Alice", "Age": 28},
+    {"Name": "Bob", "Age": 32}
 ]
-batch_result = table.batch_create_records(records_data)
+batch_result = client.records.batch_create_records(
+    table_id="table_id",
+    records=records_data
+)
 print(f"Created {batch_result.success_count} records")
-```
 
-### Querying Records
+# Get records with filtering and sorting
+records = client.tables.get_records(
+    table_id="table_id",
+    filter={
+        "operator": "and",
+        "conditions": [
+            {
+                "field": "Age",
+                "operator": ">",
+                "value": 25
+            },
+            {
+                "field": "Department",
+                "operator": "=",
+                "value": "Engineering"
+            }
+        ]
+    },
+    order_by="Name"
+)
 
-```python
-# Simple query
-records = table.get_records()
-
-# Advanced query with filters and sorting
-query = table.query()\
-    .filter("age", ">", 25)\
-    .filter("department", "=", "Engineering")\
-    .sort("name")\
-    .paginate(take=10)
-    
-records = table.get_records(query)
-
-# Process query results
+# Process records
 for record in records:
-    print(f"Name: {record.name}, Age: {record.age}")
+    print(f"Name: {record.fields['Name']}, Age: {record.fields['Age']}")
 ```
 
 ## Working with Fields
 
-### Getting Field Information
+### Managing Fields
 
 ```python
-# List all fields in a table
+# Get all fields in a table
 fields = table.fields
 
 # Access field properties
@@ -84,15 +145,17 @@ for field in fields:
         print("  Required field")
     if field.is_primary:
         print("  Primary field")
+
+# Get a specific field
+field = table.get_field("field_id")
 ```
 
 ### Field Validation
 
 ```python
-from teable import ValidationError
+from teable.exceptions import ValidationError
 
 # Validate field values
-field = table.get_field("field_id")
 try:
     field.validate_value("test@example.com")
     print("Value is valid")
@@ -102,79 +165,89 @@ except ValidationError as e:
 
 ## Working with Views
 
-### Creating and Managing Views
+### Managing Views
 
 ```python
 # Create a new view
-view = table.create_view({
-    "name": "Engineering Team",
-    "type": "grid",
-    "filter": {
+view = client.views.create(
+    table_id="table_id",
+    name="Engineering Team",
+    type="grid",
+    filter={
         "operator": "and",
         "conditions": [
             {
-                "field": "department",
+                "field": "Department",
                 "operator": "=",
                 "value": "Engineering"
             }
         ]
     }
-})
+)
 
 # Get records from a specific view
-view_records = table.get_records(view_id=view.id)
+records = client.tables.get_records(
+    table_id="table_id",
+    view_id=view.view_id
+)
 ```
 
-## Data Aggregation
-
-### Basic Aggregation
+## Using Query Builder
 
 ```python
-# Get aggregated data
-result = client.aggregation.get_aggregation(
-    table_id="table_id",
-    group_by=["category"],
-    metrics=[
-        {"field": "amount", "function": "sum"},
-        {"field": "quantity", "function": "avg"}
-    ]
+# Create a query builder
+query = table.query()
+
+# Add filters
+query.filter(
+    field="Age",
+    operator=FilterOperator.GREATER_THAN,
+    value=25
+)
+query.filter(
+    field="Department",
+    operator=FilterOperator.EQUALS,
+    value="Engineering"
 )
 
-# Process aggregation results
-for group in result.groups:
-    print(f"Category: {group.category}")
-    print(f"Total Amount: {group.metrics.amount_sum}")
-    print(f"Average Quantity: {group.metrics.quantity_avg}")
-```
-
-### Calendar View
-
-```python
-# Get calendar data
-calendar = client.aggregation.get_calendar_daily_collection(
-    table_id="table_id",
-    date_field="due_date"
+# Add sorting
+query.sort(
+    field="Name",
+    direction=SortDirection.ASCENDING
 )
 
-# Process calendar data
-for date, events in calendar.items():
-    print(f"Date: {date}")
-    for event in events:
-        print(f"  - {event.title}")
+# Add pagination
+query.paginate(take=10, skip=0)
+
+# Execute the query
+records = table.get_records(query=query.build())
 ```
 
 ## Error Handling
 
 ```python
-from teable.exceptions import TeableError, ValidationError, AuthenticationError
+from teable.exceptions import (
+    TeableError,
+    ValidationError,
+    AuthenticationError,
+    ResourceNotFoundError,
+    RateLimitError
+)
 
 try:
     # Attempt an operation
-    record = table.create_record({"invalid": "data"})
+    record = client.records.create(
+        table_id="table_id",
+        fields={"invalid": "data"}
+    )
 except ValidationError as e:
     print(f"Validation error: {e}")
 except AuthenticationError as e:
     print(f"Authentication failed: {e}")
+except ResourceNotFoundError as e:
+    print(f"Resource not found: {e}")
+except RateLimitError as e:
+    print(f"Rate limit exceeded: {e}")
 except TeableError as e:
     print(f"General error: {e}")
 ```
@@ -184,12 +257,18 @@ except TeableError as e:
 1. **Use Batch Operations**: When working with multiple records, use batch operations instead of individual calls:
    ```python
    # Good - batch operation
-   records = [{"name": f"User {i}"} for i in range(100)]
-   result = table.batch_create_records(records)
+   records = [{"Name": f"User {i}"} for i in range(100)]
+   result = client.records.batch_create_records(
+       table_id="table_id",
+       records=records
+   )
    
    # Avoid - individual calls
    for i in range(100):
-       table.create_record({"name": f"User {i}"})
+       client.records.create(
+           table_id="table_id",
+           fields={"Name": f"User {i}"}
+       )
    ```
 
 2. **Handle Rate Limits**: The client automatically handles rate limiting, but you should still structure your code to work efficiently:
@@ -198,20 +277,24 @@ except TeableError as e:
    chunk_size = 1000
    for i in range(0, len(records), chunk_size):
        chunk = records[i:i + chunk_size]
-       table.batch_create_records(chunk)
+       client.records.batch_create_records(
+           table_id="table_id",
+           records=chunk
+       )
    ```
 
 3. **Use Query Builder**: Leverage the query builder for complex queries instead of filtering in memory:
    ```python
    # Good - server-side filtering
    query = table.query()\
-       .filter("age", ">", 25)\
-       .sort("name")\
+       .filter("Age", FilterOperator.GREATER_THAN, 25)\
+       .sort("Name", SortDirection.ASCENDING)\
        .paginate(take=100)
+   records = table.get_records(query=query.build())
    
    # Avoid - client-side filtering
    all_records = table.get_records()
-   filtered = [r for r in all_records if r.age > 25]
+   filtered = [r for r in all_records if r.fields['Age'] > 25]
    ```
 
 ## Next Steps

@@ -31,102 +31,32 @@ client = TeableClient(TeableConfig(
 ))
 ```
 
-## OAuth Authentication
-
-### OAuth Flow
-
-1. Register your application
-2. Get client credentials
-3. Implement OAuth flow
-4. Handle token refresh
-
-```python
-from teable import TeableClient, TeableConfig, OAuth2Config
-
-# OAuth configuration
-oauth_config = OAuth2Config(
-    client_id="your-client-id",
-    client_secret="your-client-secret",
-    redirect_uri="your-redirect-uri"
-)
-
-# Initialize with OAuth
-config = TeableConfig(
-    api_url="https://your-teable-instance.com/api",
-    oauth=oauth_config
-)
-client = TeableClient(config)
-```
-
-## Token Management
-
-### Token Refresh
-
-```python
-# Automatic token refresh
-config = TeableConfig(
-    api_url="https://your-teable-instance.com/api",
-    oauth=oauth_config,
-    auto_refresh_token=True
-)
-
-# Manual token refresh
-new_token = client.refresh_access_token()
-```
-
-### Token Storage
-
-```python
-class TokenStorage:
-    def save_token(self, token):
-        # Implement secure token storage
-        pass
-        
-    def load_token(self):
-        # Implement secure token loading
-        pass
-
-# Use custom token storage
-config = TeableConfig(
-    api_url="https://your-teable-instance.com/api",
-    oauth=oauth_config,
-    token_storage=TokenStorage()
-)
-```
-
 ## Security Best Practices
 
 1. **API Key Security**
-   - Never hardcode API keys
-   - Use environment variables
-   - Rotate keys regularly
-   - Use separate keys for different environments
+   - Never hardcode API keys in your code
+   - Use environment variables or secure configuration management
+   - Keep your API key secret and secure
+   - Use different API keys for development and production environments
 
-2. **OAuth Security**
-   - Use HTTPS
-   - Validate redirect URIs
-   - Implement PKCE
-   - Handle token expiration
-
-3. **General Security**
-   - Implement rate limiting
-   - Monitor API usage
-   - Log authentication events
-   - Regular security audits
+2. **General Security**
+   - Always use HTTPS for API communication
+   - Implement proper error handling
+   - Follow the principle of least privilege
+   - Regularly review your security practices
 
 ## Error Handling
 
 ```python
-from teable.exceptions import AuthenticationError, TokenExpiredError
+from teable.exceptions import AuthenticationError
 
 try:
-    client = TeableClient(config)
-    # Use client...
+    client = TeableClient(TeableConfig(
+        api_url="https://your-teable-instance.com/api",
+        api_key="invalid-key"
+    ))
 except AuthenticationError as e:
     print(f"Authentication failed: {e}")
-except TokenExpiredError as e:
-    print(f"Token expired: {e}")
-    # Implement token refresh
 ```
 
 ## Next Steps
