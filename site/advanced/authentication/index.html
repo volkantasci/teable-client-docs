@@ -1337,63 +1337,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#oauth-authentication" class="md-nav__link">
-    <span class="md-ellipsis">
-      OAuth Authentication
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="OAuth Authentication">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#oauth-flow" class="md-nav__link">
-    <span class="md-ellipsis">
-      OAuth Flow
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#token-management" class="md-nav__link">
-    <span class="md-ellipsis">
-      Token Management
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Token Management">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#token-refresh" class="md-nav__link">
-    <span class="md-ellipsis">
-      Token Refresh
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#token-storage" class="md-nav__link">
-    <span class="md-ellipsis">
-      Token Storage
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#security-best-practices" class="md-nav__link">
     <span class="md-ellipsis">
       Security Best Practices
@@ -1690,63 +1633,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#oauth-authentication" class="md-nav__link">
-    <span class="md-ellipsis">
-      OAuth Authentication
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="OAuth Authentication">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#oauth-flow" class="md-nav__link">
-    <span class="md-ellipsis">
-      OAuth Flow
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#token-management" class="md-nav__link">
-    <span class="md-ellipsis">
-      Token Management
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Token Management">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#token-refresh" class="md-nav__link">
-    <span class="md-ellipsis">
-      Token Refresh
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#token-storage" class="md-nav__link">
-    <span class="md-ellipsis">
-      Token Storage
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#security-best-practices" class="md-nav__link">
     <span class="md-ellipsis">
       Security Best Practices
@@ -1811,96 +1697,33 @@
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">api_key</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;TEABLE_API_KEY&quot;</span><span class="p">)</span>
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="p">))</span>
 </code></pre></div>
-<h2 id="oauth-authentication">OAuth Authentication</h2>
-<h3 id="oauth-flow">OAuth Flow</h3>
-<ol>
-<li>Register your application</li>
-<li>Get client credentials</li>
-<li>Implement OAuth flow</li>
-<li>Handle token refresh</li>
-</ol>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">teable</span><span class="w"> </span><span class="kn">import</span> <span class="n">TeableClient</span><span class="p">,</span> <span class="n">TeableConfig</span><span class="p">,</span> <span class="n">OAuth2Config</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="c1"># OAuth configuration</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">oauth_config</span> <span class="o">=</span> <span class="n">OAuth2Config</span><span class="p">(</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">client_id</span><span class="o">=</span><span class="s2">&quot;your-client-id&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">client_secret</span><span class="o">=</span><span class="s2">&quot;your-client-secret&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">redirect_uri</span><span class="o">=</span><span class="s2">&quot;your-redirect-uri&quot;</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="p">)</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="c1"># Initialize with OAuth</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="n">config</span> <span class="o">=</span> <span class="n">TeableConfig</span><span class="p">(</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>    <span class="n">api_url</span><span class="o">=</span><span class="s2">&quot;https://your-teable-instance.com/api&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>    <span class="n">oauth</span><span class="o">=</span><span class="n">oauth_config</span>
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="p">)</span>
-<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="n">client</span> <span class="o">=</span> <span class="n">TeableClient</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-</code></pre></div>
-<h2 id="token-management">Token Management</h2>
-<h3 id="token-refresh">Token Refresh</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Automatic token refresh</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">config</span> <span class="o">=</span> <span class="n">TeableConfig</span><span class="p">(</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">api_url</span><span class="o">=</span><span class="s2">&quot;https://your-teable-instance.com/api&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">oauth</span><span class="o">=</span><span class="n">oauth_config</span><span class="p">,</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">auto_refresh_token</span><span class="o">=</span><span class="kc">True</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">)</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="c1"># Manual token refresh</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="n">new_token</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">refresh_access_token</span><span class="p">()</span>
-</code></pre></div>
-<h3 id="token-storage">Token Storage</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">TokenStorage</span><span class="p">:</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">save_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>        <span class="c1"># Implement secure token storage</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>        <span class="k">pass</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load_token</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>        <span class="c1"># Implement secure token loading</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>        <span class="k">pass</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="c1"># Use custom token storage</span>
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="n">config</span> <span class="o">=</span> <span class="n">TeableConfig</span><span class="p">(</span>
-<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>    <span class="n">api_url</span><span class="o">=</span><span class="s2">&quot;https://your-teable-instance.com/api&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>    <span class="n">oauth</span><span class="o">=</span><span class="n">oauth_config</span><span class="p">,</span>
-<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>    <span class="n">token_storage</span><span class="o">=</span><span class="n">TokenStorage</span><span class="p">()</span>
-<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="p">)</span>
-</code></pre></div>
 <h2 id="security-best-practices">Security Best Practices</h2>
 <ol>
 <li><strong>API Key Security</strong></li>
-<li>Never hardcode API keys</li>
-<li>Use environment variables</li>
-<li>Rotate keys regularly</li>
+<li>Never hardcode API keys in your code</li>
+<li>Use environment variables or secure configuration management</li>
+<li>Keep your API key secret and secure</li>
 <li>
-<p>Use separate keys for different environments</p>
-</li>
-<li>
-<p><strong>OAuth Security</strong></p>
-</li>
-<li>Use HTTPS</li>
-<li>Validate redirect URIs</li>
-<li>Implement PKCE</li>
-<li>
-<p>Handle token expiration</p>
+<p>Use different API keys for development and production environments</p>
 </li>
 <li>
 <p><strong>General Security</strong></p>
 </li>
-<li>Implement rate limiting</li>
-<li>Monitor API usage</li>
-<li>Log authentication events</li>
-<li>Regular security audits</li>
+<li>Always use HTTPS for API communication</li>
+<li>Implement proper error handling</li>
+<li>Follow the principle of least privilege</li>
+<li>Regularly review your security practices</li>
 </ol>
 <h2 id="error-handling">Error Handling</h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">teable.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthenticationError</span><span class="p">,</span> <span class="n">TokenExpiredError</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">client</span> <span class="o">=</span> <span class="n">TeableClient</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="c1"># Use client...</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="k">except</span> <span class="n">AuthenticationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Authentication failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="k">except</span> <span class="n">TokenExpiredError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Token expired: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    <span class="c1"># Implement token refresh</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">teable.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthenticationError</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">client</span> <span class="o">=</span> <span class="n">TeableClient</span><span class="p">(</span><span class="n">TeableConfig</span><span class="p">(</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>        <span class="n">api_url</span><span class="o">=</span><span class="s2">&quot;https://your-teable-instance.com/api&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>        <span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;invalid-key&quot;</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="p">))</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="k">except</span> <span class="n">AuthenticationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Authentication failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="next-steps">Next Steps</h2>
 <ul>

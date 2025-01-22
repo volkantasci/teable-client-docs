@@ -1255,9 +1255,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#handling-batch-results" class="md-nav__link">
+  <a href="#processing-results" class="md-nav__link">
     <span class="md-ellipsis">
-      Handling Batch Results
+      Processing Results
     </span>
   </a>
   
@@ -1287,15 +1287,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ordering-updates" class="md-nav__link">
-    <span class="md-ellipsis">
-      Ordering Updates
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1315,39 +1306,6 @@
   <a href="#deleting-multiple-records" class="md-nav__link">
     <span class="md-ellipsis">
       Deleting Multiple Records
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#performance-optimization" class="md-nav__link">
-    <span class="md-ellipsis">
-      Performance Optimization
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Performance Optimization">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#chunked-operations" class="md-nav__link">
-    <span class="md-ellipsis">
-      Chunked Operations
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#error-recovery" class="md-nav__link">
-    <span class="md-ellipsis">
-      Error Recovery
     </span>
   </a>
   
@@ -1724,9 +1682,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#handling-batch-results" class="md-nav__link">
+  <a href="#processing-results" class="md-nav__link">
     <span class="md-ellipsis">
-      Handling Batch Results
+      Processing Results
     </span>
   </a>
   
@@ -1756,15 +1714,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ordering-updates" class="md-nav__link">
-    <span class="md-ellipsis">
-      Ordering Updates
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1784,39 +1733,6 @@
   <a href="#deleting-multiple-records" class="md-nav__link">
     <span class="md-ellipsis">
       Deleting Multiple Records
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#performance-optimization" class="md-nav__link">
-    <span class="md-ellipsis">
-      Performance Optimization
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Performance Optimization">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#chunked-operations" class="md-nav__link">
-    <span class="md-ellipsis">
-      Chunked Operations
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#error-recovery" class="md-nav__link">
-    <span class="md-ellipsis">
-      Error Recovery
     </span>
   </a>
   
@@ -1885,7 +1801,7 @@
 
 
 <h1 id="bulk-record-operations">Bulk Record Operations</h1>
-<p>This guide covers how to perform bulk operations on records in Teable tables, including batch creation, updates, and deletions.</p>
+<p>This guide covers how to perform bulk operations on records in Teable tables.</p>
 <h2 id="batch-record-creation">Batch Record Creation</h2>
 <h3 id="creating-multiple-records">Creating Multiple Records</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">teable</span><span class="w"> </span><span class="kn">import</span> <span class="n">TeableClient</span><span class="p">,</span> <span class="n">TeableConfig</span>
@@ -1896,56 +1812,53 @@
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;your-api-key&quot;</span>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">))</span>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1"># Get your table</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="n">table</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_table</span><span class="p">(</span><span class="s2">&quot;table_id&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="c1"># Prepare multiple records</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="n">records</span> <span class="o">=</span> <span class="p">[</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="p">{</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>        <span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;John Doe&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>        <span class="s2">&quot;Email&quot;</span><span class="p">:</span> <span class="s2">&quot;john@example.com&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>        <span class="s2">&quot;Department&quot;</span><span class="p">:</span> <span class="s2">&quot;Engineering&quot;</span>
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    <span class="p">},</span>
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    <span class="p">{</span>
-<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>        <span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;Jane Smith&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>        <span class="s2">&quot;Email&quot;</span><span class="p">:</span> <span class="s2">&quot;jane@example.com&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>        <span class="s2">&quot;Department&quot;</span><span class="p">:</span> <span class="s2">&quot;Marketing&quot;</span>
-<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>    <span class="p">}</span>
-<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="p">]</span>
-<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>
-<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="c1"># Batch create records</span>
-<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="n">result</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">batch_create_records</span><span class="p">(</span>
-<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>    <span class="n">records</span><span class="o">=</span><span class="n">records</span><span class="p">,</span>
-<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>    <span class="n">field_key_type</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="p">,</span>  <span class="c1"># Use field names instead of IDs</span>
-<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>    <span class="n">typecast</span><span class="o">=</span><span class="kc">True</span>          <span class="c1"># Automatically convert data types</span>
-<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="p">)</span>
-<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>
-<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully created </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">success_count</span><span class="si">}</span><span class="s2"> records&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">failure_count</span><span class="si">}</span><span class="s2"> records&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1"># Prepare multiple records</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="n">records</span> <span class="o">=</span> <span class="p">[</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="p">{</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;John Doe&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>        <span class="s2">&quot;Email&quot;</span><span class="p">:</span> <span class="s2">&quot;john@example.com&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>        <span class="s2">&quot;Department&quot;</span><span class="p">:</span> <span class="s2">&quot;Engineering&quot;</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="p">},</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    <span class="p">{</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>        <span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;Jane Smith&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>        <span class="s2">&quot;Email&quot;</span><span class="p">:</span> <span class="s2">&quot;jane@example.com&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>        <span class="s2">&quot;Department&quot;</span><span class="p">:</span> <span class="s2">&quot;Marketing&quot;</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>    <span class="p">}</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="p">]</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="c1"># Batch create records</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="n">result</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">records</span><span class="o">.</span><span class="n">batch_create_records</span><span class="p">(</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>    <span class="n">table_id</span><span class="o">=</span><span class="s2">&quot;table_id&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>    <span class="n">records</span><span class="o">=</span><span class="n">records</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="p">)</span>
+<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>
+<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully created: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">success_count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">failure_count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Success rate: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">success_rate</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
 </code></pre></div>
-<h3 id="handling-batch-results">Handling Batch Results</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Process batch creation results</span>
+<h3 id="processing-results">Processing Results</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Process successful records</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">successful</span><span class="p">:</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created record: </span><span class="si">{</span><span class="n">record</span><span class="o">.</span><span class="n">record_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fields: </span><span class="si">{</span><span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="k">for</span> <span class="n">error</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">failed</span><span class="p">:</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed record: </span><span class="si">{</span><span class="n">error</span><span class="p">[</span><span class="s1">&#39;record&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">error</span><span class="p">[</span><span class="s1">&#39;error&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="c1"># Process failed records</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="k">for</span> <span class="n">failure</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">failed</span><span class="p">:</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed record: </span><span class="si">{</span><span class="n">failure</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="batch-record-updates">Batch Record Updates</h2>
 <h3 id="updating-multiple-records">Updating Multiple Records</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Prepare updates</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">updates</span> <span class="o">=</span> <span class="p">[</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">records</span> <span class="o">=</span> <span class="p">[</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="p">{</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>        <span class="s2">&quot;recordId&quot;</span><span class="p">:</span> <span class="s2">&quot;rec123&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>        <span class="s2">&quot;record_id&quot;</span><span class="p">:</span> <span class="s2">&quot;rec123&quot;</span><span class="p">,</span>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>        <span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="p">{</span>
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>            <span class="s2">&quot;Status&quot;</span><span class="p">:</span> <span class="s2">&quot;Active&quot;</span><span class="p">,</span>
 <a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>            <span class="s2">&quot;Department&quot;</span><span class="p">:</span> <span class="s2">&quot;Engineering&quot;</span>
 <a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        <span class="p">}</span>
 <a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="p">},</span>
 <a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="p">{</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>        <span class="s2">&quot;recordId&quot;</span><span class="p">:</span> <span class="s2">&quot;rec456&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>        <span class="s2">&quot;record_id&quot;</span><span class="p">:</span> <span class="s2">&quot;rec456&quot;</span><span class="p">,</span>
 <a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>        <span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="p">{</span>
 <a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>            <span class="s2">&quot;Status&quot;</span><span class="p">:</span> <span class="s2">&quot;Inactive&quot;</span><span class="p">,</span>
 <a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>            <span class="s2">&quot;Department&quot;</span><span class="p">:</span> <span class="s2">&quot;Marketing&quot;</span>
@@ -1954,146 +1867,106 @@
 <a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="p">]</span>
 <a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>
 <a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="c1"># Perform batch update</span>
-<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="n">result</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">batch_update_records</span><span class="p">(</span>
-<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>    <span class="n">updates</span><span class="o">=</span><span class="n">updates</span><span class="p">,</span>
-<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>    <span class="n">field_key_type</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>    <span class="n">typecast</span><span class="o">=</span><span class="kc">True</span>
-<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="p">)</span>
-<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a>
-<a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Updated </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">successful</span><span class="p">)</span><span class="si">}</span><span class="s2"> records&quot;</span><span class="p">)</span>
-</code></pre></div>
-<h3 id="ordering-updates">Ordering Updates</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Update records with specific order</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">result</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">batch_update_records</span><span class="p">(</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">updates</span><span class="o">=</span><span class="n">updates</span><span class="p">,</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">order</span><span class="o">=</span><span class="p">{</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>        <span class="s2">&quot;viewId&quot;</span><span class="p">:</span> <span class="s2">&quot;view123&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>        <span class="s2">&quot;anchorId&quot;</span><span class="p">:</span> <span class="s2">&quot;rec789&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>        <span class="s2">&quot;position&quot;</span><span class="p">:</span> <span class="s2">&quot;after&quot;</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="p">}</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="p">)</span>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="n">result</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">records</span><span class="o">.</span><span class="n">batch_update_records</span><span class="p">(</span>
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>    <span class="n">table_id</span><span class="o">=</span><span class="s2">&quot;table_id&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>    <span class="n">records</span><span class="o">=</span><span class="n">records</span>
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="p">)</span>
+<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>
+<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully updated: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">success_count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to update: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">failure_count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Success rate: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">success_rate</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="batch-record-deletion">Batch Record Deletion</h2>
 <h3 id="deleting-multiple-records">Deleting Multiple Records</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Delete multiple records</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">record_ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;rec123&quot;</span><span class="p">,</span> <span class="s2">&quot;rec456&quot;</span><span class="p">,</span> <span class="s2">&quot;rec789&quot;</span><span class="p">]</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">success</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">batch_delete_records</span><span class="p">(</span><span class="n">record_ids</span><span class="p">)</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="k">if</span> <span class="n">success</span><span class="p">:</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully deleted </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">record_ids</span><span class="p">)</span><span class="si">}</span><span class="s2"> records&quot;</span><span class="p">)</span>
-</code></pre></div>
-<h2 id="performance-optimization">Performance Optimization</h2>
-<h3 id="chunked-operations">Chunked Operations</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">process_in_chunks</span><span class="p">(</span><span class="n">records</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Process records in chunks to manage memory and API limits.&quot;&quot;&quot;</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">),</span> <span class="n">chunk_size</span><span class="p">):</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>        <span class="n">chunk</span> <span class="o">=</span> <span class="n">records</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">chunk_size</span><span class="p">]</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>        <span class="k">yield</span> <span class="n">chunk</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="c1"># Example usage with large dataset</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="n">large_dataset</span> <span class="o">=</span> <span class="p">[</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;User </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;Email&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;user</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">@example.com&quot;</span><span class="p">}</span>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="p">]</span>
-<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>
-<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="n">total_success</span> <span class="o">=</span> <span class="mi">0</span>
-<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="n">total_failure</span> <span class="o">=</span> <span class="mi">0</span>
-<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>
-<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">process_in_chunks</span><span class="p">(</span><span class="n">large_dataset</span><span class="p">):</span>
-<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">batch_create_records</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
-<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>    <span class="n">total_success</span> <span class="o">+=</span> <span class="n">result</span><span class="o">.</span><span class="n">success_count</span>
-<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>    <span class="n">total_failure</span> <span class="o">+=</span> <span class="n">result</span><span class="o">.</span><span class="n">failure_count</span>
-<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processed chunk: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">success_count</span><span class="si">}</span><span class="s2"> successful, </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">failure_count</span><span class="si">}</span><span class="s2"> failed&quot;</span><span class="p">)</span>
-<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>
-<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total: </span><span class="si">{</span><span class="n">total_success</span><span class="si">}</span><span class="s2"> successful, </span><span class="si">{</span><span class="n">total_failure</span><span class="si">}</span><span class="s2"> failed&quot;</span><span class="p">)</span>
-</code></pre></div>
-<h3 id="error-recovery">Error Recovery</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">batch_operation_with_retry</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">records</span><span class="p">,</span> <span class="n">max_retries</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform batch operation with retry for failed records.&quot;&quot;&quot;</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="n">all_results</span> <span class="o">=</span> <span class="p">{</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>        <span class="s1">&#39;successful&#39;</span><span class="p">:</span> <span class="p">[],</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>        <span class="s1">&#39;failed&#39;</span><span class="p">:</span> <span class="p">[]</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="p">}</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    <span class="n">remaining</span> <span class="o">=</span> <span class="n">records</span>
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    <span class="n">retry_count</span> <span class="o">=</span> <span class="mi">0</span>
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>    <span class="k">while</span> <span class="n">remaining</span> <span class="ow">and</span> <span class="n">retry_count</span> <span class="o">&lt;</span> <span class="n">max_retries</span><span class="p">:</span>
-<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">batch_create_records</span><span class="p">(</span><span class="n">remaining</span><span class="p">)</span>
-<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>
-<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>        <span class="c1"># Add successful records to results</span>
-<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>        <span class="n">all_results</span><span class="p">[</span><span class="s1">&#39;successful&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">successful</span><span class="p">)</span>
-<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>
-<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>        <span class="c1"># Prepare failed records for retry</span>
-<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>        <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">failed</span><span class="p">:</span>
-<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>            <span class="n">remaining</span> <span class="o">=</span> <span class="p">[</span>
-<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a>                <span class="n">failed</span><span class="p">[</span><span class="s1">&#39;record&#39;</span><span class="p">]</span>
-<a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a>                <span class="k">for</span> <span class="n">failed</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">failed</span>
-<a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a>            <span class="p">]</span>
-<a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a>            <span class="n">retry_count</span> <span class="o">+=</span> <span class="mi">1</span>
-<a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Retry </span><span class="si">{</span><span class="n">retry_count</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">remaining</span><span class="p">)</span><span class="si">}</span><span class="s2"> records&quot;</span><span class="p">)</span>
-<a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a>            <span class="n">remaining</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a>
-<a id="__codelineno-6-28" name="__codelineno-6-28" href="#__codelineno-6-28"></a>    <span class="c1"># Add any remaining failed records</span>
-<a id="__codelineno-6-29" name="__codelineno-6-29" href="#__codelineno-6-29"></a>    <span class="k">if</span> <span class="n">remaining</span><span class="p">:</span>
-<a id="__codelineno-6-30" name="__codelineno-6-30" href="#__codelineno-6-30"></a>        <span class="n">all_results</span><span class="p">[</span><span class="s1">&#39;failed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">remaining</span><span class="p">)</span>
-<a id="__codelineno-6-31" name="__codelineno-6-31" href="#__codelineno-6-31"></a>
-<a id="__codelineno-6-32" name="__codelineno-6-32" href="#__codelineno-6-32"></a>    <span class="k">return</span> <span class="n">all_results</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Delete multiple records</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">record_ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;rec123&quot;</span><span class="p">,</span> <span class="s2">&quot;rec456&quot;</span><span class="p">,</span> <span class="s2">&quot;rec789&quot;</span><span class="p">]</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">success</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">records</span><span class="o">.</span><span class="n">batch_delete_records</span><span class="p">(</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">table_id</span><span class="o">=</span><span class="s2">&quot;table_id&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">record_ids</span><span class="o">=</span><span class="n">record_ids</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">)</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully deleted </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">record_ids</span><span class="p">)</span><span class="si">}</span><span class="s2"> records&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="data-validation">Data Validation</h2>
 <h3 id="pre-validation">Pre-validation</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">validate_records</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">records</span><span class="p">):</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate records before batch operation.&quot;&quot;&quot;</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="n">valid_records</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">invalid_records</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>            <span class="n">table</span><span class="o">.</span><span class="n">validate_record_fields</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>            <span class="n">valid_records</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
-<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>        <span class="k">except</span> <span class="n">ValidationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>            <span class="n">invalid_records</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
-<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>                <span class="s1">&#39;record&#39;</span><span class="p">:</span> <span class="n">record</span><span class="p">,</span>
-<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>                <span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>            <span class="p">})</span>
-<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>
-<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>    <span class="k">return</span> <span class="n">valid_records</span><span class="p">,</span> <span class="n">invalid_records</span>
-<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>
-<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="c1"># Usage</span>
-<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="n">valid</span><span class="p">,</span> <span class="n">invalid</span> <span class="o">=</span> <span class="n">validate_records</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">records</span><span class="p">)</span>
-<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a><span class="k">if</span> <span class="n">valid</span><span class="p">:</span>
-<a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">batch_create_records</span><span class="p">(</span><span class="n">valid</span><span class="p">)</span>
-<a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="k">if</span> <span class="n">invalid</span><span class="p">:</span>
-<a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid records:&quot;</span><span class="p">)</span>
-<a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a>    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">invalid</span><span class="p">:</span>
-<a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Record: </span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;record&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;error&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">validate_records</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">table_id</span><span class="p">,</span> <span class="n">records</span><span class="p">):</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate records before batch operation.&quot;&quot;&quot;</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="c1"># Get table for validation</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">table</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">table_id</span><span class="p">)</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="n">valid_records</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="n">invalid_records</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>            <span class="n">table</span><span class="o">.</span><span class="n">validate_record_fields</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s1">&#39;fields&#39;</span><span class="p">])</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>            <span class="n">valid_records</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>        <span class="k">except</span> <span class="n">ValidationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>            <span class="n">invalid_records</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>                <span class="s1">&#39;record&#39;</span><span class="p">:</span> <span class="n">record</span><span class="p">,</span>
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>                <span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>            <span class="p">})</span>
+<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>
+<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>    <span class="k">return</span> <span class="n">valid_records</span><span class="p">,</span> <span class="n">invalid_records</span>
+<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>
+<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="c1"># Usage</span>
+<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="n">records</span> <span class="o">=</span> <span class="p">[</span>
+<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>    <span class="p">{</span>
+<a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>        <span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>            <span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;John Doe&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a>            <span class="s2">&quot;Email&quot;</span><span class="p">:</span> <span class="s2">&quot;john@example.com&quot;</span>
+<a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a>        <span class="p">}</span>
+<a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a>    <span class="p">},</span>
+<a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a>    <span class="p">{</span>
+<a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a>        <span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a>            <span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;Jane Smith&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a>            <span class="s2">&quot;Email&quot;</span><span class="p">:</span> <span class="s2">&quot;invalid-email&quot;</span>  <span class="c1"># Invalid email</span>
+<a id="__codelineno-4-33" name="__codelineno-4-33" href="#__codelineno-4-33"></a>        <span class="p">}</span>
+<a id="__codelineno-4-34" name="__codelineno-4-34" href="#__codelineno-4-34"></a>    <span class="p">}</span>
+<a id="__codelineno-4-35" name="__codelineno-4-35" href="#__codelineno-4-35"></a><span class="p">]</span>
+<a id="__codelineno-4-36" name="__codelineno-4-36" href="#__codelineno-4-36"></a>
+<a id="__codelineno-4-37" name="__codelineno-4-37" href="#__codelineno-4-37"></a><span class="n">valid</span><span class="p">,</span> <span class="n">invalid</span> <span class="o">=</span> <span class="n">validate_records</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="s2">&quot;table_id&quot;</span><span class="p">,</span> <span class="n">records</span><span class="p">)</span>
+<a id="__codelineno-4-38" name="__codelineno-4-38" href="#__codelineno-4-38"></a>
+<a id="__codelineno-4-39" name="__codelineno-4-39" href="#__codelineno-4-39"></a><span class="c1"># Create valid records</span>
+<a id="__codelineno-4-40" name="__codelineno-4-40" href="#__codelineno-4-40"></a><span class="k">if</span> <span class="n">valid</span><span class="p">:</span>
+<a id="__codelineno-4-41" name="__codelineno-4-41" href="#__codelineno-4-41"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">records</span><span class="o">.</span><span class="n">batch_create_records</span><span class="p">(</span>
+<a id="__codelineno-4-42" name="__codelineno-4-42" href="#__codelineno-4-42"></a>        <span class="n">table_id</span><span class="o">=</span><span class="s2">&quot;table_id&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-43" name="__codelineno-4-43" href="#__codelineno-4-43"></a>        <span class="n">records</span><span class="o">=</span><span class="n">valid</span>
+<a id="__codelineno-4-44" name="__codelineno-4-44" href="#__codelineno-4-44"></a>    <span class="p">)</span>
+<a id="__codelineno-4-45" name="__codelineno-4-45" href="#__codelineno-4-45"></a>
+<a id="__codelineno-4-46" name="__codelineno-4-46" href="#__codelineno-4-46"></a><span class="c1"># Log invalid records</span>
+<a id="__codelineno-4-47" name="__codelineno-4-47" href="#__codelineno-4-47"></a><span class="k">if</span> <span class="n">invalid</span><span class="p">:</span>
+<a id="__codelineno-4-48" name="__codelineno-4-48" href="#__codelineno-4-48"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid records:&quot;</span><span class="p">)</span>
+<a id="__codelineno-4-49" name="__codelineno-4-49" href="#__codelineno-4-49"></a>    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">invalid</span><span class="p">:</span>
+<a id="__codelineno-4-50" name="__codelineno-4-50" href="#__codelineno-4-50"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Record: </span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;record&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-4-51" name="__codelineno-4-51" href="#__codelineno-4-51"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;error&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="best-practices">Best Practices</h2>
 <ol>
 <li><strong>Batch Size</strong></li>
-<li>Use appropriate chunk sizes (500-1000 records)</li>
-<li>Monitor memory usage</li>
+<li>Use reasonable batch sizes</li>
 <li>Consider API rate limits</li>
+<li>Monitor performance</li>
 <li>
-<p>Balance performance and reliability</p>
+<p>Handle failures appropriately</p>
 </li>
 <li>
 <p><strong>Error Handling</strong></p>
 </li>
-<li>Implement retry mechanisms</li>
+<li>Validate data before operations</li>
+<li>Handle validation errors</li>
 <li>Log failed operations</li>
-<li>Provide meaningful error messages</li>
 <li>
-<p>Consider partial success scenarios</p>
+<p>Provide meaningful error messages</p>
 </li>
 <li>
 <p><strong>Performance</strong></p>
 </li>
-<li>Use chunked operations</li>
-<li>Implement parallel processing when appropriate</li>
+<li>Use batch operations for multiple records</li>
 <li>Monitor operation timing</li>
+<li>Consider rate limits</li>
 <li>
 <p>Optimize data preparation</p>
 </li>
@@ -2103,7 +1976,7 @@
 <li>Validate data before operations</li>
 <li>Maintain referential integrity</li>
 <li>Handle duplicates appropriately</li>
-<li>Consider transaction boundaries</li>
+<li>Back up important data</li>
 </ol>
 <h2 id="next-steps">Next Steps</h2>
 <ul>

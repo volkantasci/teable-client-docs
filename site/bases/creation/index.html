@@ -751,15 +751,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#creating-from-a-space-instance" class="md-nav__link">
-    <span class="md-ellipsis">
-      Creating from a Space Instance
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -769,15 +760,6 @@
   <a href="#duplicating-bases" class="md-nav__link">
     <span class="md-ellipsis">
       Duplicating Bases
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#creating-from-templates" class="md-nav__link">
-    <span class="md-ellipsis">
-      Creating from Templates
     </span>
   </a>
   
@@ -1792,15 +1774,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#creating-from-a-space-instance" class="md-nav__link">
-    <span class="md-ellipsis">
-      Creating from a Space Instance
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1810,15 +1783,6 @@
   <a href="#duplicating-bases" class="md-nav__link">
     <span class="md-ellipsis">
       Duplicating Bases
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#creating-from-templates" class="md-nav__link">
-    <span class="md-ellipsis">
-      Creating from Templates
     </span>
   </a>
   
@@ -2026,7 +1990,6 @@
 <p>A base in Teable is a container for tables and other resources within a space. This guide covers how to create and manage bases using the Teable-Client library.</p>
 <h2 id="creating-a-base">Creating a Base</h2>
 <h3 id="basic-base-creation">Basic Base Creation</h3>
-<p>The simplest way to create a base is within a space:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">teable</span><span class="w"> </span><span class="kn">import</span> <span class="n">TeableClient</span><span class="p">,</span> <span class="n">TeableConfig</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1"># Initialize the client</span>
@@ -2036,7 +1999,7 @@
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">))</span>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1"># Create a base in a space</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="n">base</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">create_base</span><span class="p">(</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="n">base</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
 <a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="n">space_id</span><span class="o">=</span><span class="s2">&quot;space123&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Project Tracker&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;📊&quot;</span>  <span class="c1"># Optional emoji or icon identifier</span>
@@ -2044,151 +2007,112 @@
 <a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
 <a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created base: </span><span class="si">{</span><span class="n">base</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> (ID: </span><span class="si">{</span><span class="n">base</span><span class="o">.</span><span class="n">base_id</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
 </code></pre></div>
-<h3 id="creating-from-a-space-instance">Creating from a Space Instance</h3>
-<p>You can also create a base directly from a space instance:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Get a space</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">space</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_space</span><span class="p">(</span><span class="s2">&quot;space123&quot;</span><span class="p">)</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Create a base in this space</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">base</span> <span class="o">=</span> <span class="n">space</span><span class="o">.</span><span class="n">create_base</span><span class="p">(</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Customer Database&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;👥&quot;</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="p">)</span>
-</code></pre></div>
 <h2 id="duplicating-bases">Duplicating Bases</h2>
 <p>You can create a copy of an existing base:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Duplicate a base</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">duplicated_base</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">duplicate_base</span><span class="p">(</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">from_base_id</span><span class="o">=</span><span class="s2">&quot;base123&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">space_id</span><span class="o">=</span><span class="s2">&quot;space123&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Project Tracker Copy&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">with_records</span><span class="o">=</span><span class="kc">True</span>  <span class="c1"># Include existing records in the copy</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="p">)</span>
-</code></pre></div>
-<p>Or duplicate from a base instance:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Get an existing base</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">base</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_base</span><span class="p">(</span><span class="s2">&quot;base123&quot;</span><span class="p">)</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Create a duplicate</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">duplicate</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">duplicate</span><span class="p">(</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">space_id</span><span class="o">=</span><span class="s2">&quot;space123&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Project Tracker - Development&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">with_records</span><span class="o">=</span><span class="kc">False</span>  <span class="c1"># Start with empty tables</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="p">)</span>
-</code></pre></div>
-<h2 id="creating-from-templates">Creating from Templates</h2>
-<p>You can create a new base from an existing template:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Create a base from a template</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">base</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">create_base_from_template</span><span class="p">(</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">space_id</span><span class="o">=</span><span class="s2">&quot;space123&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">template_id</span><span class="o">=</span><span class="s2">&quot;template123&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">with_records</span><span class="o">=</span><span class="kc">True</span>  <span class="c1"># Include template records</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Duplicate a base</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">duplicated_base</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">duplicate</span><span class="p">(</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">from_base_id</span><span class="o">=</span><span class="s2">&quot;base123&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">space_id</span><span class="o">=</span><span class="s2">&quot;space123&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Project Tracker Copy&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">with_records</span><span class="o">=</span><span class="kc">True</span>  <span class="c1"># Include existing records in the copy</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">)</span>
 </code></pre></div>
 <h2 id="base-configuration">Base Configuration</h2>
 <h3 id="updating-base-information">Updating Base Information</h3>
-<p>You can update a base's name and icon:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Get a base</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">base</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_base</span><span class="p">(</span><span class="s2">&quot;base123&quot;</span><span class="p">)</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># Update base information</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">updated_base</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;New Project Tracker&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;🚀&quot;</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Get a base</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">base</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;base123&quot;</span><span class="p">)</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Update base information</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">updated_base</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;New Project Tracker&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;🚀&quot;</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="p">)</span>
 </code></pre></div>
 <h3 id="managing-base-order">Managing Base Order</h3>
 <p>You can arrange bases within a space:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">teable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Position</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="c1"># Update base position</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">base</span><span class="o">.</span><span class="n">update_order</span><span class="p">(</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="n">anchor_id</span><span class="o">=</span><span class="s2">&quot;base456&quot;</span><span class="p">,</span>  <span class="c1"># The base to position relative to</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="n">position</span><span class="o">=</span><span class="n">Position</span><span class="o">.</span><span class="n">AFTER</span>  <span class="c1"># or Position.BEFORE</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">teable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Position</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># Update base position</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">base</span><span class="o">.</span><span class="n">update_order</span><span class="p">(</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">anchor_id</span><span class="o">=</span><span class="s2">&quot;base456&quot;</span><span class="p">,</span>  <span class="c1"># The base to position relative to</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">position</span><span class="o">=</span><span class="n">Position</span><span class="o">.</span><span class="n">AFTER</span>  <span class="c1"># or Position.BEFORE</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">)</span>
 </code></pre></div>
 <h2 id="base-permissions">Base Permissions</h2>
 <h3 id="checking-permissions">Checking Permissions</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Get permissions for a base</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">permissions</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">get_permissions</span><span class="p">()</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Check specific permissions</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="k">for</span> <span class="n">permission</span><span class="p">,</span> <span class="n">allowed</span> <span class="ow">in</span> <span class="n">permissions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">permission</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="s1">&#39;Allowed&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">allowed</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;Not Allowed&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Get permissions for a base</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">permissions</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">get_permissions</span><span class="p">()</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Check specific permissions</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="k">for</span> <span class="n">permission</span><span class="p">,</span> <span class="n">allowed</span> <span class="ow">in</span> <span class="n">permissions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">permission</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="s1">&#39;Allowed&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">allowed</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;Not Allowed&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="base-collaborators">Base Collaborators</h2>
 <h3 id="adding-collaborators">Adding Collaborators</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Add collaborators to a base</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">collaborators</span> <span class="o">=</span> <span class="p">[</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    <span class="p">{</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>        <span class="s2">&quot;principalId&quot;</span><span class="p">:</span> <span class="s2">&quot;user123&quot;</span><span class="p">,</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>        <span class="s2">&quot;principalType&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>    <span class="p">},</span>
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>    <span class="p">{</span>
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>        <span class="s2">&quot;principalId&quot;</span><span class="p">:</span> <span class="s2">&quot;dept456&quot;</span><span class="p">,</span>
-<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>        <span class="s2">&quot;principalType&quot;</span><span class="p">:</span> <span class="s2">&quot;department&quot;</span>
-<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>    <span class="p">}</span>
-<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="p">]</span>
-<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>
-<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="n">base</span><span class="o">.</span><span class="n">add_collaborators</span><span class="p">(</span>
-<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>    <span class="n">collaborators</span><span class="o">=</span><span class="n">collaborators</span><span class="p">,</span>
-<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;editor&quot;</span>  <span class="c1"># Options: creator, editor, commenter, viewer</span>
-<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Add collaborators to a base</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">collaborators</span> <span class="o">=</span> <span class="p">[</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="p">{</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>        <span class="s2">&quot;principalId&quot;</span><span class="p">:</span> <span class="s2">&quot;user123&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>        <span class="s2">&quot;principalType&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="p">},</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="p">{</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>        <span class="s2">&quot;principalId&quot;</span><span class="p">:</span> <span class="s2">&quot;dept456&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>        <span class="s2">&quot;principalType&quot;</span><span class="p">:</span> <span class="s2">&quot;department&quot;</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    <span class="p">}</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="p">]</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="n">base</span><span class="o">.</span><span class="n">add_collaborators</span><span class="p">(</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>    <span class="n">collaborators</span><span class="o">=</span><span class="n">collaborators</span><span class="p">,</span>
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;editor&quot;</span>  <span class="c1"># Options: creator, editor, commenter, viewer</span>
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="p">)</span>
 </code></pre></div>
 <h3 id="managing-collaborators">Managing Collaborators</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">teable.models.collaborator</span><span class="w"> </span><span class="kn">import</span> <span class="n">PrincipalType</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="c1"># List collaborators</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">collaborators</span><span class="p">,</span> <span class="n">total</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">get_collaborators</span><span class="p">(</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="n">include_system</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>    <span class="n">take</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
-<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>    <span class="n">search</span><span class="o">=</span><span class="s2">&quot;john&quot;</span>
-<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="p">)</span>
-<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>
-<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="c1"># Update collaborator role</span>
-<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="n">base</span><span class="o">.</span><span class="n">update_collaborator</span><span class="p">(</span>
-<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>    <span class="n">principal_id</span><span class="o">=</span><span class="s2">&quot;user123&quot;</span><span class="p">,</span>
-<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>    <span class="n">principal_type</span><span class="o">=</span><span class="n">PrincipalType</span><span class="o">.</span><span class="n">USER</span><span class="p">,</span>
-<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;editor&quot;</span>
-<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="p">)</span>
-<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>
-<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="c1"># Remove collaborator</span>
-<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="n">base</span><span class="o">.</span><span class="n">delete_collaborator</span><span class="p">(</span>
-<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>    <span class="n">principal_id</span><span class="o">=</span><span class="s2">&quot;user123&quot;</span><span class="p">,</span>
-<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a>    <span class="n">principal_type</span><span class="o">=</span><span class="n">PrincipalType</span><span class="o">.</span><span class="n">USER</span>
-<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">teable.models.collaborator</span><span class="w"> </span><span class="kn">import</span> <span class="n">PrincipalType</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="c1"># List collaborators</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">collaborators</span><span class="p">,</span> <span class="n">total</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">get_collaborators</span><span class="p">(</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="n">include_system</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="n">take</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    <span class="n">search</span><span class="o">=</span><span class="s2">&quot;john&quot;</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="p">)</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="c1"># Update collaborator role</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="n">base</span><span class="o">.</span><span class="n">update_collaborator</span><span class="p">(</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>    <span class="n">principal_id</span><span class="o">=</span><span class="s2">&quot;user123&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>    <span class="n">principal_type</span><span class="o">=</span><span class="n">PrincipalType</span><span class="o">.</span><span class="n">USER</span><span class="p">,</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;editor&quot;</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="p">)</span>
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="c1"># Remove collaborator</span>
+<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="n">base</span><span class="o">.</span><span class="n">delete_collaborator</span><span class="p">(</span>
+<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>    <span class="n">principal_id</span><span class="o">=</span><span class="s2">&quot;user123&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a>    <span class="n">principal_type</span><span class="o">=</span><span class="n">PrincipalType</span><span class="o">.</span><span class="n">USER</span>
+<a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a><span class="p">)</span>
 </code></pre></div>
 <h2 id="base-invitations">Base Invitations</h2>
 <h3 id="creating-invitation-links">Creating Invitation Links</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Create an invitation link</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">invitation</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">create_invitation_link</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s2">&quot;editor&quot;</span><span class="p">)</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invitation URL: </span><span class="si">{</span><span class="n">invitation</span><span class="o">.</span><span class="n">invite_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="c1"># List all invitation links</span>
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="n">invitations</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">get_invitation_links</span><span class="p">()</span>
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="k">for</span> <span class="n">inv</span> <span class="ow">in</span> <span class="n">invitations</span><span class="p">:</span>
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ID: </span><span class="si">{</span><span class="n">inv</span><span class="o">.</span><span class="n">invitation_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Role: </span><span class="si">{</span><span class="n">inv</span><span class="o">.</span><span class="n">role</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Create an invitation link</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">invitation</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">create_invitation_link</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s2">&quot;editor&quot;</span><span class="p">)</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># List all invitation links</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="n">invitations</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">get_invitation_links</span><span class="p">()</span>
 </code></pre></div>
 <h3 id="sending-email-invitations">Sending Email Invitations</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># Send invitation emails</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">emails</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;user1@example.com&quot;</span><span class="p">,</span> <span class="s2">&quot;user2@example.com&quot;</span><span class="p">]</span>
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">result</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">send_email_invitations</span><span class="p">(</span>
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="n">emails</span><span class="o">=</span><span class="n">emails</span><span class="p">,</span>
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;editor&quot;</span>
-<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="p">)</span>
-<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>
-<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="k">for</span> <span class="n">email</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invited </span><span class="si">{</span><span class="n">email</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;invitationId&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Send invitation emails</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">emails</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;user1@example.com&quot;</span><span class="p">,</span> <span class="s2">&quot;user2@example.com&quot;</span><span class="p">]</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">result</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">send_email_invitations</span><span class="p">(</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="n">emails</span><span class="o">=</span><span class="n">emails</span><span class="p">,</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;editor&quot;</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="p">)</span>
 </code></pre></div>
 <h2 id="base-deletion">Base Deletion</h2>
 <h3 id="moving-to-trash">Moving to Trash</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Move base to trash (can be restored later)</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">base</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Move base to trash (can be restored later)</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">base</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
 </code></pre></div>
 <h3 id="permanent-deletion">Permanent Deletion</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># Permanently delete a base (cannot be undone)</span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">base</span><span class="o">.</span><span class="n">delete_permanent</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Permanently delete a base (cannot be undone)</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">base</span><span class="o">.</span><span class="n">delete_permanent</span><span class="p">()</span>
 </code></pre></div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -2217,21 +2141,20 @@
 </li>
 <li>Consider whether to include records when duplicating</li>
 <li>Back up important bases before major changes</li>
-<li>Use templates for standardized base structures</li>
 <li>Maintain consistent naming conventions</li>
 </ol>
 <h2 id="error-handling">Error Handling</h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">teable.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">TeableError</span><span class="p">,</span> <span class="n">ValidationError</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    <span class="n">base</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">create_base</span><span class="p">(</span>
-<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>        <span class="n">space_id</span><span class="o">=</span><span class="s2">&quot;space123&quot;</span><span class="p">,</span>
-<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;New Project&quot;</span>
-<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>    <span class="p">)</span>
-<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="k">except</span> <span class="n">ValidationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid base configuration: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="k">except</span> <span class="n">TeableError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error creating base: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">teable.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">TeableError</span><span class="p">,</span> <span class="n">ValidationError</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="n">base</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>        <span class="n">space_id</span><span class="o">=</span><span class="s2">&quot;space123&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;New Project&quot;</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>    <span class="p">)</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="k">except</span> <span class="n">ValidationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid base configuration: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="k">except</span> <span class="n">TeableError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error creating base: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="next-steps">Next Steps</h2>
 <p>After creating and configuring your base, you can:</p>
