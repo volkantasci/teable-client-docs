@@ -2,6 +2,46 @@
 
 This guide covers authentication methods and security best practices for the Teable-Client library.
 
+## Email/Password Authentication
+
+### Sign In
+
+```python
+from teable import TeableClient
+
+# Initialize client
+client = TeableClient()
+
+# Sign in with email and password
+user = client.auth.signin(email="your-email@example.com", password="YourPassword123")
+
+# Get current user info
+current_user = client.auth.get_user()
+
+# Sign out
+client.auth.signout()
+```
+
+### Password Requirements
+- Must contain at least one uppercase letter
+- Must contain at least one number
+- Must be of sufficient length (minimum 8 characters recommended)
+
+### Environment Variables
+
+For better security, use environment variables:
+
+```python
+import os
+from teable import TeableClient
+
+client = TeableClient()
+user = client.auth.signin(
+    email=os.getenv("TEABLE_EMAIL"),
+    password=os.getenv("TEABLE_PASSWORD")
+)
+```
+
 ## API Key Authentication
 
 ### Basic Authentication

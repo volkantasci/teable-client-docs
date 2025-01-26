@@ -2,22 +2,69 @@
 
 Spaces in Teable are organizational units that contain bases (databases). This guide covers how to create and manage spaces using the Teable-Client library.
 
-## Creating a Space
+## Space Operations
 
-Creating a new space is straightforward:
+### Creating a Space
 
 ```python
-from teable import TeableClient, TeableConfig
+from teable import TeableClient
 
 # Initialize the client
-client = TeableClient(TeableConfig(
-    api_url="https://your-teable-instance.com/api",
-    api_key="your-api-key"
-))
+client = TeableClient()
 
 # Create a new space
-space = client.spaces.create(name="My Project Space")
+space = client.spaces.create_space(name="My Project Space")
 print(f"Created space with ID: {space.space_id}")
+```
+
+### Listing Spaces
+
+```python
+# Get all spaces
+spaces = client.spaces.get_spaces()
+for space in spaces:
+    print(f"Space: {space.name} (ID: {space.space_id})")
+```
+
+### Updating Space
+
+```python
+# Update space name
+space.update("Updated Space Name")
+
+# Verify update
+updated_space = client.spaces.get_space(space.space_id)
+assert updated_space.name == "Updated Space Name"
+```
+
+### Deleting Space
+
+```python
+# Permanently delete a space
+client.spaces.permanently_delete_space(space.space_id)
+```
+
+## Base Management
+
+### Getting Bases
+
+```python
+# Get all bases in the space
+bases = space.get_bases()
+for base in bases:
+    print(f"Base: {base.name} (ID: {base.base_id})")
+```
+
+### Creating a Base
+
+```python
+# Create a new base in the space
+base = space.create_base(
+    name="My New Base",
+    icon="📊"  # Optional emoji icon
+)
+assert base.name == "My New Base"
+assert base.space_id == space.space_id
 ```
 
 ## Managing Space Collaborators

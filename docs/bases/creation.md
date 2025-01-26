@@ -7,22 +7,28 @@ A base in Teable is a container for tables and other resources within a space. T
 ### Basic Base Creation
 
 ```python
-from teable import TeableClient, TeableConfig
+from teable import TeableClient
 
-# Initialize the client
-client = TeableClient(TeableConfig(
-    api_url="https://your-teable-instance.com/api",
-    api_key="your-api-key"
-))
+# Initialize the client and get spaces
+client = TeableClient()
+spaces = client.spaces.get_spaces()
+space = spaces[0]  # Get first space
 
-# Create a base in a space
-base = client.tables.create(
-    space_id="space123",
+# Create a base in the space
+base = space.create_base(
     name="Project Tracker",
     icon="📊"  # Optional emoji or icon identifier
 )
 
 print(f"Created base: {base.name} (ID: {base.base_id})")
+
+# Access base attributes
+print(f"Space ID: {base.space_id}")
+print(f"Is Unrestricted: {base.is_unrestricted}")
+print(f"Collaborator Type: {base.collaborator_type}")
+
+# Convert to dictionary representation
+base_dict = base.to_dict()
 ```
 
 ## Duplicating Bases
@@ -31,12 +37,16 @@ You can create a copy of an existing base:
 
 ```python
 # Duplicate a base
-duplicated_base = client.tables.duplicate(
-    from_base_id="base123",
-    space_id="space123",
+duplicated_base = base.duplicate(
+    space_id=space.space_id,
     name="Project Tracker Copy",
-    with_records=True  # Include existing records in the copy
+    with_records=False  # Whether to include existing records in the copy
 )
+
+# Verify duplication
+assert duplicated_base.name == "Project Tracker Copy"
+assert duplicated_base.space_id == space.space_id
+assert duplicated_base.base_id != base.base_id  # Different ID from original
 ```
 
 ## Base Configuration
@@ -153,24 +163,28 @@ result = base.send_email_invitations(
 )
 ```
 
-## Base Deletion
+## Base Querying
 
-### Moving to Trash
+You can execute SQL queries on a base:
 
 ```python
-# Move base to trash (can be restored later)
-base.delete()
+# Execute a query with default cell format
+results = base.query("SELECT * FROM your_table")
+
+# Execute a query with JSON cell format
+results_json = base.query("SELECT * FROM your_table", cell_format='json')
 ```
 
-### Permanent Deletion
+## Base Deletion
 
 ```python
-# Permanently delete a base (cannot be undone)
-base.delete_permanent()
+# Delete a base
+result = base.delete()
+assert result is True  # Verify deletion was successful
 ```
 
 !!! warning "Warning"
-    Permanent deletion cannot be undone. Make sure to back up any important data before proceeding.
+    Base deletion cannot be undone. Make sure to back up any important data before proceeding.
 
 ## Best Practices
 

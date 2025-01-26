@@ -7,22 +7,68 @@ This guide covers how to create and configure tables in Teable using the Teable-
 ### Creating a Simple Table
 
 ```python
-from teable import TeableClient, TeableConfig
+from teable import TeableClient
 
 # Initialize the client
-client = TeableClient(TeableConfig(
-    api_url="https://your-teable-instance.com/api",
-    api_key="your-api-key"
-))
+client = TeableClient()
 
 # Create a basic table
-table = client.tables.create(
-    space_id="space123",
+table = client.tables.create_table(
+    base_id="base123",
     name="Employees",
+    db_table_name="employees",  # Must start with letter, max 63 chars
     description="Employee directory and information"
 )
 
 print(f"Created table: {table.table_id}")
+
+# Validate db_table_name
+try:
+    client.tables.create_table(
+        base_id="base123",
+        name="Invalid Table",
+        db_table_name="1invalid_name"  # Must start with letter
+    )
+except ValueError as e:
+    print(f"Invalid db_table_name: {e}")
+
+try:
+    client.tables.create_table(
+        base_id="base123",
+        name="Invalid Table",
+        db_table_name="a" * 64  # Too long
+    )
+except ValueError as e:
+    print(f"Invalid db_table_name: {e}")
+```
+
+### Updating Table Information
+
+```python
+# Update table name
+client.tables.update_table_name(
+    base_id="base123",
+    table_id="table123",
+    name="Updated Table Name"
+)
+
+# Update table description
+client.tables.update_table_description(
+    base_id="base123",
+    table_id="table123",
+    description="Updated description"
+)
+```
+
+### Deleting a Table
+
+```python
+# Delete a table
+result = client.tables.delete_table(
+    base_id="base123",
+    table_id="table123"
+)
+assert result is True
 ```
 
 ### Creating a Table with Fields
@@ -65,6 +111,53 @@ table = client.tables.create(
     description="Employee directory and information",
     fields=fields
 )
+```
+
+## Table Views
+
+### Creating a Table with Views
+
+```python
+# Create a table with views
+table = client.tables.create_table(
+    base_id="base123",
+    name="Table with Views",
+    db_table_name="viewtable",
+    fields=[{"name": "Name", "type": "singleLineText"}],
+    views=[{
+        "name": "Default View",
+        "type": "grid"
+    }]
+)
+
+# Get all views
+views = table.views
+print(f"Number of views: {len(views)}")
+
+# Get default view ID
+default_view_id = client.tables.get_table_default_view_id(
+    base_id="base123",
+    table_id=table.table_id
+)
+print(f"Default view ID: {default_view_id}")
+```
+
+## Table Permissions
+
+### Getting Table Permissions
+
+```python
+# Get table permissions
+permissions = client.tables.get_table_permission(
+    base_id="base123",
+    table_id="table123"
+)
+
+# Check specific permissions
+print(f"Table permissions: {permissions['table']}")
+print(f"View permissions: {permissions['view']}")
+print(f"Record permissions: {permissions['record']}")
+print(f"Field permissions: {permissions['field']}")
 ```
 
 ## Field Management

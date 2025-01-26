@@ -8,31 +8,103 @@ The TeableClient class provides the primary interface for interacting with Teabl
 
 ### Constructor
 
+The TeableClient can be initialized in two ways:
+
+#### Using TeableConfig Object
+
 ```python
 from teable import TeableClient, TeableConfig
 
 client = TeableClient(
     config=TeableConfig(
         api_url="https://your-teable-instance.com/api",
-        api_key="your-api-key"
+        api_key="your-api-key",
+        timeout=45.0,
+        max_retries=5
     )
 )
 ```
 
+#### Using Dictionary Configuration
+
+```python
+from teable import TeableClient
+
+client = TeableClient({
+    'api_url': "https://your-teable-instance.com/api",
+    'api_key': "your-api-key",
+    'timeout': 60.0,
+    'max_retries': 5
+})
+```
+
 ### Configuration Options
 
-The `TeableConfig` class accepts the following parameters:
+The configuration accepts the following parameters:
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| api_url | str | Yes | The base URL of your Teable instance API |
-| api_key | str | Yes | Your API key for authentication |
-| timeout | int | No | Request timeout in seconds (default: 30) |
-| max_retries | int | No | Maximum number of retry attempts (default: 3) |
+| Parameter | Type | Required | Description | Validation Rules |
+|-----------|------|----------|-------------|-----------------|
+| api_url | str | Yes | The base URL of your Teable instance API | Must be a valid URL |
+| api_key | str | Yes | Your API key for authentication | Must start with 'teable_' |
+| timeout | float | No | Request timeout in seconds (default: 30) | Must be positive |
+| max_retries | int | No | Maximum number of retry attempts (default: 3) | Must be non-negative |
+
+### Configuration Validation
+
+The client performs validation on the configuration parameters:
+
+```python
+# Invalid API key format
+client = TeableClient({
+    'api_key': 'invalid_key',  # Will raise ConfigurationError
+    'api_url': 'https://api.teable.io'
+})
+
+# Invalid API URL
+client = TeableClient({
+    'api_key': 'teable_test_key',
+    'api_url': 'not_a_url'  # Will raise ConfigurationError
+})
+
+# Invalid timeout
+client = TeableClient({
+    'api_key': 'teable_test_key',
+    'api_url': 'https://api.teable.io',
+    'timeout': -1  # Will raise ConfigurationError
+})
+```
 
 ## Available Managers
 
-The TeableClient provides access to various specialized managers for different aspects of the API:
+The TeableClient provides access to various specialized managers for different aspects of the API. Here's a complete list of available managers:
+
+| Manager | Description |
+|---------|-------------|
+| spaces | Space management operations |
+| tables | Table and base operations |
+| records | Record CRUD operations |
+| fields | Field configuration and management |
+| views | View creation and management |
+| attachments | File attachment operations |
+| selection | Record selection operations |
+| notifications | Notification management |
+| access_tokens | Access token management |
+| imports | Data import operations |
+| exports | Data export operations |
+| pins | Pin management |
+| billing | Billing and subscription operations |
+| admin | Administrative operations |
+| usage | Usage statistics and monitoring |
+| oauth | OAuth integration management |
+| undo_redo | Operation history management |
+| plugins | Plugin management |
+| comments | Comment operations |
+| organizations | Organization management |
+| ai | AI-powered operations |
+| integrity | Data integrity checks |
+| aggregation | Data aggregation operations |
+
+Example usage of these managers:
 
 ### Space Operations (client.spaces)
 

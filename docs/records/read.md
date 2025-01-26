@@ -7,25 +7,44 @@ This guide covers how to read and query records in Teable tables using the Teabl
 ### Getting a Single Record
 
 ```python
-from teable import TeableClient, TeableConfig
+from teable import TeableClient, Record
 
 # Initialize the client
-client = TeableClient(TeableConfig(
-    api_url="https://your-teable-instance.com/api",
-    api_key="your-api-key"
-))
+client = TeableClient()
 
-# Get a record by ID
+# Get a record by ID and convert to Record object
 try:
-    record = client.records.get(
-        table_id="table_id",
-        record_id="rec123",
-        cell_format="json"  # or "text"
+    record = Record.from_api_response(
+        client.records.get_record(
+            table_id="table_id",
+            record_id="rec123"
+        )
     )
     print(f"Record ID: {record.record_id}")
     print(f"Fields: {record.fields}")
 except ResourceNotFoundError:
     print("Record not found")
+
+# Get record status
+status = client.records.get_record_status(
+    table_id="table_id",
+    record_id="rec123"
+)
+print(f"Is visible: {status.is_visible}")
+print(f"Is deleted: {status.is_deleted}")
+
+# Get record history
+history = client.records.get_record_history(
+    table_id="table_id",
+    record_id="rec123"
+)
+print(f"History users: {history.users}")
+
+# Get table record history
+table_history = client.records.get_table_record_history(
+    table_id="table_id"
+)
+print(f"Table history users: {table_history.users}")
 ```
 
 ### Specifying Fields to Return
@@ -60,54 +79,76 @@ for record in records:
     print("---")
 ```
 
-### Using Query Builder
+### Advanced Querying
+
+#### Using Filter Sets
 
 ```python
-from teable import FilterOperator, SortDirection
+# Get field IDs first
+fields = client.fields.get_table_fields(table_id)
+category_field = next(f for f in fields if f.name == "Category")
 
-# Get table for query builder
-table = client.tables.get("table_id")
+# Create filter parameters
+filter_params = {
+    "filterSet": [
+        {
+            "operator": "is",
+            "fieldId": category_field.field_id,
+            "value": "A"
+        }
+    ],
+    "conjunction": "and"
+}
 
-# Create a query using the query builder
-query = table.query()
-
-# Add filters
-query.filter(
-    field="Department",
-    operator=FilterOperator.EQUALS,
-    value="Engineering"
-)
-query.filter(
-    field="Salary",
-    operator=FilterOperator.GREATER_THAN,
-    value=75000
-)
-
-# Add sorting
-query.sort(
-    field="Name",
-    direction=SortDirection.ASCENDING
-)
-
-# Add pagination
-query.paginate(take=10)
-
-# Execute the query
-records = client.records.get_records(
+# Get filtered records
+filtered_records = client.records.get_records(
     table_id="table_id",
-    query=query.build()
+    filter=filter_params
+)
+```
+
+#### Using Search
+
+```python
+# Get field IDs first
+fields = client.fields.get_table_fields(table_id)
+name_field = next(f for f in fields if f.name == "Name")
+
+# Create search parameters
+search_params = {
+    "search": [{
+        "value": "John",
+        "field": name_field.field_id,
+        "exact": True  # For exact matching
+    }]
+}
+
+# Get searched records
+searched_records = client.records.get_records(
+    table_id="table_id",
+    **search_params
 )
 ```
 
 ### Pagination
 
 ```python
-# Get records with pagination
+# Skip default empty records (usually first 3)
 records = client.records.get_records(
     table_id="table_id",
-    take=50,    # Number of records to return
-    skip=100    # Number of records to skip
+    skip=3,     # Skip default empty records
+    take=50     # Number of records to return
 )
+
+# For regular pagination
+records = client.records.get_records(
+    table_id="table_id",
+    skip=100,   # Skip first 100 records
+    take=50     # Return next 50 records
+)
+
+# Verify pagination results
+assert len(records) == 50  # Got requested number of records
 ```
 
 ## Field Formatting
