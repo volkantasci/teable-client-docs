@@ -20,11 +20,15 @@ client.auth.signin(
     email="your-email@example.com",
     password="your-password"
 )
+
+# Get current user info
+user = client.auth.get_user()
+print(f"Signed in as: {user.email}")
 ```
 
 ## Working with Spaces
 
-Spaces are the top-level containers in Teable. Here's how to work with them:
+Spaces are the top-level containers in Teable:
 
 ```python
 # Create a new space
@@ -38,9 +42,6 @@ for space in spaces:
 # Get a specific space
 space = client.spaces.get_space("space_id")
 
-# Update space name
-space.update("Updated Space Name")
-
 # Create an invitation link
 invitation = space.create_invitation_link(role="editor")
 print(f"Invitation URL: {invitation.invite_url}")
@@ -52,33 +53,17 @@ space.invite_by_email(
 )
 ```
 
-## Managing Bases
+## Managing Tables
 
-Bases are containers for tables within a space:
-
-```python
-# Create a base in a space
-base = space.create_base(name="My Project Base")
-
-# Get all bases in a space
-bases = space.get_bases()
-for base in bases:
-    print(f"Base: {base.name} (ID: {base.base_id})")
-
-# Delete a base
-base.delete()
-```
-
-## Working with Tables
-
-Tables store your actual data:
+Tables store your data with specific field types and configurations:
 
 ```python
 # Create a table with fields
 table = client.tables.create_table(
-    base_id=base.base_id,
+    base_id="base_id",
     name="Employees",
-    db_table_name="employees",
+    db_table_name="employees",  # Must be 1-63 chars, start with letter
+    description="Employee records",
     fields=[
         {
             "name": "Name",
@@ -105,7 +90,7 @@ for field in fields:
 
 ## Managing Records
 
-Records are the individual data entries in a table:
+Records are individual data entries in a table:
 
 ```python
 # Create a single record
@@ -120,7 +105,11 @@ records_data = [
     {"Name": "Alice Smith", "Email": "alice@example.com", "Age": 25},
     {"Name": "Bob Johnson", "Email": "bob@example.com", "Age": 35}
 ]
-batch_result = table.batch_create_records(records_data)
+batch_result = table.batch_create_records(
+    records_data,
+    field_key_type="name",  # Use field names instead of IDs
+    typecast=True  # Enable automatic type conversion
+)
 print(f"Created {batch_result.success_count} records")
 
 # Query records with filtering
@@ -135,28 +124,59 @@ filter_data = {
     "conjunction": "and"
 }
 
-filtered_records = table.get_records(
+# Get records with various parameters
+records = table.get_records(
+    field_key_type="name",
     filter=filter_data,
+    take=100,  # Pagination: records per page
+    skip=0,    # Pagination: records to skip
+    cell_format="json"  # Response format (json or text)
+)
+
+# Search records
+search_params = [{
+    "value": "John",
+    "field": "Name",
+    "exact": True
+}]
+
+search_results = table.get_records(
+    search=search_params,
     field_key_type="name"
 )
 
-# Update a record
+# Update records
 updated_record = table.update_record(
     record.record_id,
     {"Age": 31}
 )
 
-# Delete a record
+# Batch update records
+updates = [
+    {
+        "id": record.record_id,
+        "fields": {"Age": record.fields["Age"] + 1}
+    }
+    for record in records
+]
+
+updated_records = table.batch_update_records(
+    updates,
+    field_key_type="name",
+    typecast=True
+)
+
+# Delete records
 table.delete_record(record.record_id)
 
 # Batch delete records
-record_ids = [record.record_id for record in filtered_records]
+record_ids = [record.record_id for record in records]
 table.batch_delete_records(record_ids)
 ```
 
 ## Working with Views
 
-Views provide different ways to visualize table data:
+Views provide different ways to visualize and filter table data:
 
 ```python
 # Create a view
@@ -179,6 +199,12 @@ view = table.create_view({
 views = table.views
 for view in views:
     print(f"View: {view.name} (Type: {view.view_type})")
+
+# Get default view ID
+default_view_id = client.tables.get_table_default_view_id(
+    base_id="base_id",
+    table_id=table.table_id
+)
 ```
 
 ## Error Handling
@@ -198,8 +224,30 @@ except ValidationError as e:
     print(f"Validation error: {str(e)}")
 except APIError as e:
     print(f"API error: {str(e)}")
+    print(f"Status code: {e.status_code}")
+    print(f"Error details: {e.details}")
 except Exception as e:
     print(f"Unexpected error: {str(e)}")
+```
+
+## Resource Management
+
+Always clean up resources when done:
+
+```python
+try:
+    # Perform operations
+    space = client.spaces.create_space(name="Temporary Space")
+    base = space.create_base(name="Temporary Base")
+    # ... more operations ...
+finally:
+    # Clean up
+    if base:
+        base.delete()
+    if space:
+        client.spaces.permanently_delete_space(space.space_id)
+    # Sign out
+    client.auth.signout()
 ```
 
 ## Best Practices
@@ -207,18 +255,22 @@ except Exception as e:
 1. **Authentication**:
    - Always sign in for operations requiring full access
    - Handle authentication errors appropriately
+   - Sign out when done
 
 2. **Resource Management**:
    - Use batch operations for multiple records
-   - Clean up resources when no longer needed
+   - Clean up temporary resources
+   - Implement proper error handling
 
-3. **Error Handling**:
-   - Catch specific exceptions
-   - Implement proper error recovery
-
-4. **Performance**:
+3. **Performance**:
    - Use pagination for large datasets
-   - Implement rate limiting in your application
+   - Implement caching where appropriate
+   - Use field projections to limit data transfer
+
+4. **Error Handling**:
+   - Catch specific exceptions
+   - Implement retry logic for transient failures
+   - Log errors appropriately
 
 ## Next Steps
 

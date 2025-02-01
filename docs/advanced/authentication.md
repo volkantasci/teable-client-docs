@@ -1,21 +1,12 @@
 # Authentication
 
-The Teable Client Library supports two levels of authentication:
+The Teable Client Library provides comprehensive authentication and user management functionality through the `AuthManager` class.
 
-1. API Key Authentication
-2. User Authentication (Email/Password)
-
-Understanding these authentication methods and when to use them is crucial for working with the Teable API effectively.
-
-## Authentication Levels
+## Authentication Methods
 
 ### 1. API Key Authentication
 
-API key authentication provides basic access to the Teable API. This level of authentication is suitable for:
-
-- Reading public data
-- Basic table operations
-- Record operations within accessible tables
+Required for all API access:
 
 ```python
 from teable import TeableClient, TeableConfig
@@ -29,21 +20,10 @@ client = TeableClient(TeableConfig(
 
 ### 2. User Authentication
 
-User authentication provides full access to all API features. This level is required for:
-
-- Space management
-- Base creation/deletion
-- User management
-- Permission changes
-- Advanced operations
+Required for advanced operations like space management:
 
 ```python
-# First initialize with API key
-client = TeableClient(TeableConfig(
-    api_key="your_api_key_here"
-))
-
-# Then sign in with user credentials
+# Sign in with email/password
 user = client.auth.signin(
     email="your-email@example.com",
     password="your-password"
@@ -53,63 +33,128 @@ user = client.auth.signin(
 current_user = client.auth.get_user()
 print(f"Signed in as: {current_user.email}")
 
+# Get detailed user info
+detailed_info = client.auth.get_user_info()
+
 # Sign out when done
 client.auth.signout()
 ```
 
-## Configuration Methods
+## User Management
 
-### Environment Variables
-
-You can use environment variables for configuration:
-
-```bash
-# .env file
-TEABLE_API_KEY=your_api_key_here
-TEABLE_API_URL=https://api.teable.io
-TEABLE_EMAIL=your-email@example.com
-TEABLE_PASSWORD=your-password
-```
+### Profile Management
 
 ```python
-from teable import TeableClient
-from dotenv import load_dotenv
+# Update user name
+client.auth.update_user_name("New Name")
 
-# Load environment variables
-load_dotenv()
-
-# Initialize client from environment
-client = TeableClient.from_env()
-```
-
-### Direct Configuration
-
-You can also configure the client directly in code:
-
-```python
-from teable import TeableClient, TeableConfig
-
-config = TeableConfig(
-    api_key="your_api_key_here",
-    api_url="https://api.teable.io"  # Optional
+# Update avatar
+with open("avatar.jpg", "rb") as f:
+    avatar_data = f.read()
+client.auth.update_user_avatar(
+    avatar_data,
+    mime_type="image/jpeg"
 )
-client = TeableClient(config)
+
+# Update notification settings
+client.auth.update_user_notify_meta(email=True)
 ```
 
-## Password Requirements
+### Email Management
 
-When signing in, passwords must meet these requirements:
+```python
+# Send email change verification code
+result = client.auth.send_change_email_code(
+    email="new-email@example.com",
+    password="current-password"
+)
+token = result["token"]
 
-- Minimum length: 8 characters
-- Must contain at least one uppercase letter
-- Must contain at least one number
-- Must not contain invalid characters
+# Change email with verification
+client.auth.change_email(
+    email="new-email@example.com",
+    token=token,
+    code="123456"  # Code received in email
+)
+```
+
+### Password Management
+
+```python
+# Add password (for users without password)
+client.auth.add_password("NewPassword123")
+
+# Change password
+client.auth.change_password(
+    password="CurrentPassword123",
+    new_password="NewPassword123"
+)
+
+# Reset password flow
+client.auth.send_reset_password_email("user@example.com")
+client.auth.reset_password(
+    password="NewPassword123",
+    code="123456"  # Code received in email
+)
+```
+
+### Account Creation
+
+```python
+# Send signup verification code
+result = client.auth.send_signup_verification_code("new-user@example.com")
+verification = {
+    "token": result["token"],
+    "code": "123456"  # Code received in email
+}
+
+# Sign up new user
+user = client.auth.signup(
+    email="new-user@example.com",
+    password="Password123",
+    default_space_name="My Space",  # Optional
+    verification=verification,
+    ref_meta={  # Optional
+        "query": "source=website",
+        "referer": "https://example.com"
+    }
+)
+```
+
+## Validation Rules
+
+### Email Validation
+
+Emails must:
+- Be a valid string
+- Match standard email format (user@domain.tld)
+- Pass server-side validation
+
+```python
+# Example of email validation
+try:
+    client.auth.signin(
+        email="invalid-email",  # Will raise ValidationError
+        password="ValidPass123"
+    )
+except ValidationError as e:
+    print(f"Invalid email: {str(e)}")
+```
+
+### Password Validation
+
+Passwords must:
+- Be a string
+- Be at least 8 characters long
+- Contain at least one uppercase letter
+- Contain at least one number
+- Not contain invalid characters
 
 ```python
 # Example of password validation
 try:
     client.auth.signin(
-        email="test@example.com",
+        email="user@example.com",
         password="short"  # Will raise ValidationError
     )
 except ValidationError as e:
@@ -125,131 +170,128 @@ from teable.exceptions import ValidationError, APIError
 
 try:
     client.auth.signin(
-        email="invalid-email",  # Invalid email format
-        password="ValidPass123"
+        email="user@example.com",
+        password="wrong-password"
     )
 except ValidationError as e:
     print(f"Validation error: {str(e)}")
 except APIError as e:
-    print(f"API error: {str(e)}")
+    if e.status_code == 401:
+        print("Invalid credentials")
+    elif e.status_code == 403:
+        print("Account locked")
+    else:
+        print(f"API error: {str(e)}")
 ```
 
 ## Best Practices
 
-1. **API Key Security**:
-   - Never commit API keys to version control
-   - Use environment variables or secure configuration management
-   - Rotate API keys periodically
+### 1. Secure Credential Management
 
-2. **User Authentication**:
-   - Sign in only when needed
-   - Sign out when operations are complete
-   - Handle authentication errors gracefully
-   - Implement proper password security
+```python
+import os
+from dotenv import load_dotenv
 
-3. **Error Recovery**:
-   - Implement retry logic for temporary failures
-   - Handle token expiration appropriately
-   - Log authentication failures for monitoring
+# Load credentials from environment
+load_dotenv()
 
-4. **Configuration Management**:
-   - Use environment variables in production
-   - Keep credentials secure
-   - Implement proper secret management
+client = TeableClient(TeableConfig(
+    api_key=os.getenv('TEABLE_API_KEY')
+))
+
+client.auth.signin(
+    email=os.getenv('TEABLE_EMAIL'),
+    password=os.getenv('TEABLE_PASSWORD')
+)
+```
+
+### 2. Session Management
+
+```python
+def get_authenticated_client():
+    client = TeableClient(TeableConfig(
+        api_key=os.getenv('TEABLE_API_KEY')
+    ))
+    
+    try:
+        client.auth.signin(
+            email=os.getenv('TEABLE_EMAIL'),
+            password=os.getenv('TEABLE_PASSWORD')
+        )
+        return client
+    except Exception as e:
+        print(f"Authentication failed: {str(e)}")
+        raise
+
+def cleanup_client(client):
+    try:
+        client.auth.signout()
+    except Exception as e:
+        print(f"Signout failed: {str(e)}")
+```
+
+### 3. Error Recovery
+
+```python
+import time
+from teable.exceptions import APIError
+
+def retry_auth(func, max_retries=3):
+    for attempt in range(max_retries):
+        try:
+            return func()
+        except APIError as e:
+            if e.status_code == 429:  # Rate limit
+                if attempt < max_retries - 1:
+                    time.sleep(2 ** attempt)  # Exponential backoff
+                    continue
+            raise
+    raise Exception("Max retries exceeded")
+
+# Usage
+client = retry_auth(get_authenticated_client)
+```
 
 ## Operation Requirements
 
-Here's a quick reference for which operations require which level of authentication:
+Here's a reference for which operations require which level of authentication:
 
 ### API Key Only
-- Read public records
-- Basic table queries
+- Basic table operations
+- Record reading
 - Field validation
 - View access
 
 ### User Authentication Required
-- Space creation/deletion
-- Base management
+- Space management
+- Base operations
+- User profile updates
 - Permission changes
-- User invitations
+- Invitation management
 - Advanced operations
 
-## Example Workflow
+## Security Considerations
 
-Here's a complete example of proper authentication usage:
+1. **API Key Security**:
+   - Never commit API keys to version control
+   - Use environment variables or secure vaults
+   - Rotate keys periodically
+   - Use different keys for development/production
 
-```python
-from teable import TeableClient, TeableConfig
-from teable.exceptions import ValidationError, APIError
+2. **Password Security**:
+   - Implement proper password policies
+   - Handle password resets securely
+   - Use secure password storage
+   - Implement rate limiting for auth attempts
 
-def setup_teable_client():
-    try:
-        # Initialize with API key
-        client = TeableClient(TeableConfig(
-            api_key="your_api_key_here"
-        ))
-        
-        # Sign in for full access
-        client.auth.signin(
-            email="your-email@example.com",
-            password="your-password"
-        )
-        
-        return client
-    
-    except ValidationError as e:
-        print(f"Configuration error: {str(e)}")
-        raise
-    except APIError as e:
-        print(f"API error: {str(e)}")
-        raise
-    except Exception as e:
-        print(f"Unexpected error: {str(e)}")
-        raise
+3. **Session Management**:
+   - Sign out when done
+   - Implement session timeouts
+   - Handle token expiration
+   - Secure token storage
 
-def main():
-    try:
-        # Set up client
-        client = setup_teable_client()
-        
-        # Perform operations requiring authentication
-        space = client.spaces.create_space(name="New Project")
-        
-        # Clean up
-        client.auth.signout()
-        
-    except Exception as e:
-        print(f"Error: {str(e)}")
-        # Implement proper error recovery
-
-if __name__ == "__main__":
-    main()
-```
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Invalid API Key**:
-   - Verify the API key is correct
-   - Check if the API key has the necessary permissions
-   - Ensure the API key is active
-
-2. **Authentication Failures**:
-   - Verify email and password are correct
-   - Check if the account is active
-   - Ensure the API URL is correct
-
-3. **Permission Errors**:
-   - Verify the user has necessary permissions
-   - Check if authentication was successful
-   - Ensure operations match authentication level
-
-### Getting Help
-
-If you encounter authentication issues:
-
-1. Check the error message for specific details
-2. Verify your credentials and configuration
-3. Review the [error handling documentation](error-handling.md)
-4. Contact support with specific error details
+4. **Error Handling**:
+   - Don't expose sensitive info in errors
+   - Log authentication failures
+   - Implement proper error recovery
+   - Use secure error messages

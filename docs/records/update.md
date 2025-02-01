@@ -1,233 +1,308 @@
 # Updating Records
 
-This guide covers how to update existing records in Teable tables using the Teable-Client library.
+This guide covers all methods for updating records in Teable tables.
 
-## Basic Record Updates
+## Single Record Updates
 
-### Updating a Single Record
+### Basic Update
 
 ```python
 from teable import TeableClient, TeableConfig
 
-# Initialize the client
-client = TeableClient(TeableConfig(
-    api_url="https://your-teable-instance.com/api",
-    api_key="your-api-key"
-))
+# Initialize client
+client = TeableClient(TeableConfig(api_key="your_api_key"))
 
-# Update a record
-updated_record = client.records.update(
+# Update a single record
+updated_record = client.records.update_record(
     table_id="table_id",
-    record_id="rec123",
+    record_id="record_id",
     fields={
-        "Name": "John Smith",
-        "Department": "Marketing",
-        "Status": "Active"
-    }
-)
-
-print(f"Updated record ID: {updated_record.record_id}")
-```
-
-### Updating Different Field Types
-
-```python
-# Update different field types
-updated_record = client.records.update(
-    table_id="table_id",
-    record_id="rec123",
-    fields={
-        # Text fields
-        "Name": "Alice Johnson",
-        "Description": "Senior Developer",
-        
-        # Numeric fields
-        "Salary": 85000,
-        "Years Experience": 5,
-        
-        # Date fields
-        "Last Review": "2023-06-30T14:30:00Z",
-        
-        # Boolean fields
-        "Is Manager": True,
-        
-        # Select fields
-        "Department": "Engineering",
-        "Skills": ["Python", "JavaScript", "Docker"]
+        "Name": "Updated Name",
+        "Email": "updated@example.com"
     }
 )
 ```
 
-## Batch Updates
-
-### Updating Multiple Records
+### Advanced Update Options
 
 ```python
-# Prepare updates
-records = [
+# Update with type conversion and field keys
+updated_record = client.records.update_record(
+    table_id="table_id",
+    record_id="record_id",
+    fields={
+        "Age": "30",  # Will be converted to number
+        "IsActive": "true"  # Will be converted to boolean
+    },
+    field_key_type="name",  # Use field names instead of IDs
+    typecast=True,  # Enable automatic type conversion
+    order={  # Optional record ordering
+        "viewId": "view_id",
+        "position": "after",
+        "recordId": "anchor_record_id"
+    }
+)
+```
+
+## Batch Record Updates
+
+### Basic Batch Update
+
+```python
+# Update multiple records at once
+updates = [
     {
-        "record_id": "rec123",
+        "id": "record1_id",
         "fields": {
-            "Status": "Active",
-            "Department": "Engineering"
+            "Status": "Completed",
+            "Progress": 100
         }
     },
     {
-        "record_id": "rec456",
+        "id": "record2_id",
         "fields": {
-            "Status": "Inactive",
-            "Department": "Marketing"
+            "Status": "In Progress",
+            "Progress": 50
         }
     }
 ]
 
-# Perform batch update
-result = client.records.batch_update_records(
+updated_records = client.records.batch_update_records(
     table_id="table_id",
-    records=records
+    updates=updates,
+    field_key_type="name",
+    typecast=True
 )
-
-print(f"Successfully updated: {result.success_count}")
-print(f"Failed updates: {result.failure_count}")
-print(f"Success rate: {result.success_rate}%")
-
-# Process results
-for record in result.successful:
-    print(f"Updated record: {record.record_id}")
-
-for failure in result.failed:
-    print(f"Failed update: {failure}")
 ```
 
-## Validation and Error Handling
+### Batch Update with Ordering
 
-### Pre-validation
+```python
+# Update records with specific ordering
+updated_records = client.records.batch_update_records(
+    table_id="table_id",
+    updates=updates,
+    field_key_type="name",
+    typecast=True,
+    order={
+        "viewId": "view_id",
+        "position": "after",
+        "recordId": "anchor_record_id"
+    }
+)
+```
+
+## Validation Rules
+
+### Field Values
 
 ```python
 from teable.exceptions import ValidationError
 
+# Example of field validation
 try:
-    # Get table for validation
-    table = client.tables.get("table_id")
-    
-    # Prepare update data
-    fields = {
-        "Name": "Test User",
-        "Email": "test@example.com",
-        "Department": "Engineering"
-    }
-    
-    # Validate fields before update
-    table.validate_record_fields(fields)
-    
-    # Perform update if validation passes
-    updated_record = client.records.update(
-        table_id=table.table_id,
-        record_id="rec123",
-        fields=fields
+    client.records.update_record(
+        table_id="table_id",
+        record_id="record_id",
+        fields={}  # Empty fields - will raise ValidationError
     )
 except ValidationError as e:
-    print(f"Validation error: {e}")
+    print(f"Validation error: {str(e)}")
 ```
 
-### Safe Updates
+### Batch Operations
 
 ```python
-from teable.exceptions import TeableError, ResourceNotFoundError
-
-def safe_update_record(client, table_id, record_id, fields):
-    """Safely update a record with error handling."""
-    try:
-        # Get table for validation
-        table = client.tables.get(table_id)
-        
-        # Validate fields first
-        table.validate_record_fields(fields)
-        
-        # Perform update
-        record = client.records.update(
-            table_id=table_id,
-            record_id=record_id,
-            fields=fields
-        )
-        return record
-        
-    except ValidationError as e:
-        print(f"Field validation error: {e}")
-        return None
-    except ResourceNotFoundError:
-        print(f"Record {record_id} not found")
-        return None
-    except TeableError as e:
-        print(f"Error updating record: {e}")
-        return None
+# Batch update validation
+try:
+    # Too many records in one batch
+    updates = [{"id": f"id_{i}", "fields": {}} for i in range(2001)]
+    client.records.batch_update_records(
+        table_id="table_id",
+        updates=updates
+    )
+except ValidationError as e:
+    print(f"Validation error: {str(e)}")
 ```
 
-## Advanced Updates
-
-### Conditional Updates
+## Error Handling
 
 ```python
-def update_if_changed(client, table_id, record_id, new_fields):
-    """Update record only if fields have changed."""
-    try:
-        # Get current record
-        current = client.records.get(
-            table_id=table_id,
-            record_id=record_id
-        )
-        
-        # Check for changes
-        changes = {}
-        for field, value in new_fields.items():
-            if current.fields.get(field) != value:
-                changes[field] = value
-        
-        # Update if there are changes
-        if changes:
-            return client.records.update(
-                table_id=table_id,
-                record_id=record_id,
-                fields=changes
-            )
-        return current
-        
-    except TeableError as e:
-        print(f"Error: {e}")
-        return None
+from teable.exceptions import ValidationError, APIError
+
+try:
+    client.records.update_record(
+        table_id="table_id",
+        record_id="record_id",
+        fields={
+            "Email": "invalid-email",
+            "Age": "not-a-number"
+        }
+    )
+except ValidationError as e:
+    print(f"Validation error: {str(e)}")
+except APIError as e:
+    print(f"API error: {str(e)}")
+    print(f"Status code: {e.status_code}")
+    print(f"Error details: {e.details}")
 ```
 
 ## Best Practices
 
-1. **Data Validation**
-   - Validate data before updates
-   - Use appropriate data types
-   - Handle validation errors gracefully
-   - Document validation requirements
+### 1. Use Batch Updates
 
-2. **Performance**
-   - Use batch updates for multiple records
-   - Monitor update performance
-   - Consider rate limits
-   - Handle failures appropriately
+```python
+# DON'T: Update records one by one
+for record_id, new_data in updates.items():
+    client.records.update_record(
+        table_id="table_id",
+        record_id=record_id,
+        fields=new_data
+    )
 
-3. **Error Handling**
-   - Implement comprehensive error handling
-   - Log update failures
-   - Provide meaningful error messages
-   - Consider recovery strategies
+# DO: Use batch update
+batch_updates = [
+    {"id": record_id, "fields": new_data}
+    for record_id, new_data in updates.items()
+]
+client.records.batch_update_records(
+    table_id="table_id",
+    updates=batch_updates
+)
+```
 
-4. **Data Integrity**
-   - Validate data relationships
-   - Handle linked records appropriately
-   - Consider cascading updates
-   - Maintain data consistency
+### 2. Enable Typecast
 
-## Next Steps
+```python
+# Enable automatic type conversion
+client.records.update_record(
+    table_id="table_id",
+    record_id="record_id",
+    fields={
+        "Age": "30",  # String will be converted to number
+        "IsActive": "true",  # String will be converted to boolean
+        "Date": "2023-01-01"  # String will be converted to date
+    },
+    typecast=True
+)
+```
 
-After mastering record updates, you can:
+### 3. Implement Retry Logic
 
-- [Delete records](delete.md)
-- [Query records](read.md)
-- [Work with bulk operations](bulk-operations.md)
-- [Set up views](../views/creation.md)
+```python
+import time
+from teable.exceptions import APIError
+
+def retry_batch_update(client, table_id, updates, max_retries=3):
+    for attempt in range(max_retries):
+        try:
+            return client.records.batch_update_records(
+                table_id=table_id,
+                updates=updates
+            )
+        except APIError as e:
+            if e.status_code == 429:  # Rate limit
+                if attempt < max_retries - 1:
+                    time.sleep(2 ** attempt)  # Exponential backoff
+                    continue
+            raise
+    raise Exception("Max retries exceeded")
+```
+
+### 4. Validate Before Updating
+
+```python
+def validate_update_data(data):
+    """Validate update data before sending to API."""
+    required_fields = ["Name", "Email"]
+    for field in required_fields:
+        if field in data and not data[field]:
+            raise ValidationError(f"Field '{field}' cannot be empty")
+    
+    if "Email" in data:
+        email = data["Email"]
+        if not "@" in email:
+            raise ValidationError("Invalid email format")
+    
+    if "Age" in data:
+        try:
+            age = int(data["Age"])
+            if age < 0 or age > 120:
+                raise ValidationError("Age must be between 0 and 120")
+        except ValueError:
+            raise ValidationError("Age must be a number")
+
+# Use validation before update
+try:
+    update_data = {
+        "Name": "John Doe",
+        "Email": "john@example.com",
+        "Age": 30
+    }
+    
+    validate_update_data(update_data)
+    
+    client.records.update_record(
+        table_id="table_id",
+        record_id="record_id",
+        fields=update_data
+    )
+except ValidationError as e:
+    print(f"Validation failed: {str(e)}")
+```
+
+### 5. Handle Partial Success in Batch Updates
+
+```python
+def handle_batch_update(client, table_id, updates):
+    """Handle batch updates with error tracking."""
+    try:
+        results = client.records.batch_update_records(
+            table_id=table_id,
+            updates=updates
+        )
+        
+        # Track successful updates
+        successful_ids = [r["id"] for r in results]
+        
+        # Find failed updates
+        failed_ids = set(u["id"] for u in updates) - set(successful_ids)
+        
+        if failed_ids:
+            print(f"Failed to update records: {failed_ids}")
+            # Implement retry logic for failed records
+            retry_updates = [
+                u for u in updates
+                if u["id"] in failed_ids
+            ]
+            # Retry failed updates...
+            
+        return results
+        
+    except APIError as e:
+        print(f"Batch update failed: {str(e)}")
+        raise
+```
+
+### 6. Optimize Large Updates
+
+```python
+def update_records_in_batches(client, table_id, updates, batch_size=500):
+    """Update large number of records in batches."""
+    results = []
+    
+    # Split updates into smaller batches
+    for i in range(0, len(updates), batch_size):
+        batch = updates[i:i + batch_size]
+        try:
+            batch_results = client.records.batch_update_records(
+                table_id=table_id,
+                updates=batch
+            )
+            results.extend(batch_results)
+            
+        except APIError as e:
+            print(f"Batch {i//batch_size + 1} failed: {str(e)}")
+            # Handle error or retry
+    
+    return results

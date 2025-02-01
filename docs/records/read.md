@@ -1,287 +1,333 @@
-# Reading and Querying Records
+# Reading Records
 
-This guide covers how to read and query records in Teable tables using the Teable-Client library.
+This guide covers all methods for retrieving records from Teable tables.
 
-## Reading Individual Records
+## Getting Records
+
+### Basic Record Retrieval
+
+```python
+from teable import TeableClient, TeableConfig
+
+# Initialize client
+client = TeableClient(TeableConfig(api_key="your_api_key"))
+
+# Get records with default parameters
+records = client.records.get_records(
+    table_id="table_id",
+    field_key_type="name"  # Use field names instead of IDs
+)
+```
+
+### Advanced Query Parameters
+
+```python
+# Get records with all available parameters
+records = client.records.get_records(
+    table_id="table_id",
+    projection=["Name", "Email"],  # Only return specific fields
+    cell_format="json",  # 'json' or 'text'
+    field_key_type="name",  # 'name' or 'id'
+    view_id="view_id",  # Filter by view
+    ignore_view_query=False,  # Whether to ignore view's filter/sort
+    filter_by_tql="Name = 'John'",  # Filter using Teable Query Language
+    filter={  # Complex filter object
+        "filterSet": [
+            {
+                "fieldId": "Age",
+                "operator": "isGreaterEqual",
+                "value": 30
+            }
+        ],
+        "conjunction": "and"
+    },
+    search=[  # Search parameters
+        {
+            "value": "John",
+            "field": "Name",
+            "exact": True
+        }
+    ],
+    filter_link_cell_candidate="linked_record_id",  # Filter by link field candidates
+    filter_link_cell_selected="selected_record_id",  # Filter by link field selection
+    selected_record_ids=["record1", "record2"],  # Filter by specific records
+    order_by="Name",  # Sort specification
+    group_by="Department",  # Group specification
+    collapsed_group_ids=["group1", "group2"],  # List of collapsed group IDs
+    take=100,  # Number of records to return (max 2000)
+    skip=0  # Number of records to skip
+)
+```
 
 ### Getting a Single Record
 
 ```python
-from teable import TeableClient, Record
+# Get a single record by ID
+record = client.records.get_record(
+    table_id="table_id",
+    record_id="record_id",
+    projection=["Name", "Email"],  # Optional: specific fields
+    cell_format="json",  # Optional: format
+    field_key_type="name"  # Optional: key type
+)
+```
 
-# Initialize the client
-client = TeableClient()
+## Record Status and History
 
-# Get a record by ID and convert to Record object
-try:
-    record = Record.from_api_response(
-        client.records.get_record(
-            table_id="table_id",
-            record_id="rec123"
-        )
-    )
-    print(f"Record ID: {record.record_id}")
-    print(f"Fields: {record.fields}")
-except ResourceNotFoundError:
-    print("Record not found")
+### Checking Record Status
 
-# Get record status
+```python
+# Get record visibility and deletion status
 status = client.records.get_record_status(
     table_id="table_id",
-    record_id="rec123"
+    record_id="record_id"
 )
+
 print(f"Is visible: {status.is_visible}")
 print(f"Is deleted: {status.is_deleted}")
+```
 
-# Get record history
+### Getting Record History
+
+```python
+# Get history for a specific record
 history = client.records.get_record_history(
     table_id="table_id",
-    record_id="rec123"
+    record_id="record_id"
 )
-print(f"History users: {history.users}")
 
-# Get table record history
+# Print history entries
+for entry in history.entries:
+    print(f"Changed by: {history.users[entry.user_id].name}")
+    print(f"Action: {entry.action}")
+    print(f"Time: {entry.created_time}")
+
+# Get history for all records in a table
 table_history = client.records.get_table_record_history(
     table_id="table_id"
 )
-print(f"Table history users: {table_history.users}")
 ```
 
-### Specifying Fields to Return
+## Search and Filter Options
+
+### Text Search
 
 ```python
-# Get specific fields only
-record = client.records.get(
-    table_id="table_id",
-    record_id="rec123",
-    projection=["Name", "Email", "Department"]
-)
-
-# Access the fields
-print(f"Name: {record.fields.get('Name')}")
-print(f"Email: {record.fields.get('Email')}")
-```
-
-## Querying Multiple Records
-
-### Basic Query
-
-```python
-# Get all records
+# Simple text search
 records = client.records.get_records(
-    table_id="table_id"
-)
-
-# Process records
-for record in records:
-    print(f"Record ID: {record.record_id}")
-    print(f"Fields: {record.fields}")
-    print("---")
-```
-
-### Advanced Querying
-
-#### Using Filter Sets
-
-```python
-# Get field IDs first
-fields = client.fields.get_table_fields(table_id)
-category_field = next(f for f in fields if f.name == "Category")
-
-# Create filter parameters
-filter_params = {
-    "filterSet": [
-        {
-            "operator": "is",
-            "fieldId": category_field.field_id,
-            "value": "A"
-        }
-    ],
-    "conjunction": "and"
-}
-
-# Get filtered records
-filtered_records = client.records.get_records(
     table_id="table_id",
-    filter=filter_params
-)
-```
-
-#### Using Search
-
-```python
-# Get field IDs first
-fields = client.fields.get_table_fields(table_id)
-name_field = next(f for f in fields if f.name == "Name")
-
-# Create search parameters
-search_params = {
-    "search": [{
+    search=[{
         "value": "John",
-        "field": name_field.field_id,
-        "exact": True  # For exact matching
+        "field": "Name",
+        "exact": True  # Exact match
     }]
-}
+)
 
-# Get searched records
-searched_records = client.records.get_records(
+# Multiple search criteria
+records = client.records.get_records(
     table_id="table_id",
-    **search_params
+    search=[
+        {
+            "value": "John",
+            "field": "Name",
+            "exact": False  # Partial match
+        },
+        {
+            "value": "Developer",
+            "field": "Title",
+            "exact": True
+        }
+    ]
 )
 ```
 
-### Pagination
+### Complex Filtering
 
 ```python
-# Skip default empty records (usually first 3)
+# Filter with multiple conditions
 records = client.records.get_records(
     table_id="table_id",
-    skip=3,     # Skip default empty records
-    take=50     # Number of records to return
+    filter={
+        "filterSet": [
+            {
+                "fieldId": "Age",
+                "operator": "isGreaterEqual",
+                "value": 30
+            },
+            {
+                "fieldId": "Department",
+                "operator": "is",
+                "value": "Engineering"
+            }
+        ],
+        "conjunction": "and"
+    }
 )
 
-# For regular pagination
+# Filter with TQL (Teable Query Language)
 records = client.records.get_records(
     table_id="table_id",
-    skip=100,   # Skip first 100 records
-    take=50     # Return next 50 records
-)
-
-# Verify pagination results
-assert len(records) == 50  # Got requested number of records
-```
-
-## Field Formatting
-
-### Cell Format Options
-
-```python
-# Get records with JSON formatting
-records = client.records.get_records(
-    table_id="table_id",
-    cell_format="json"
-)
-
-# Get records with text formatting
-records = client.records.get_records(
-    table_id="table_id",
-    cell_format="text"
+    filter_by_tql="Age >= 30 AND Department = 'Engineering'"
 )
 ```
 
-### Field Key Types
+## Pagination
 
 ```python
-# Use field names as keys
-records = client.records.get_records(
-    table_id="table_id",
-    field_key_type="name"
-)
-
-# Use field IDs as keys
-records = client.records.get_records(
-    table_id="table_id",
-    field_key_type="id"
-)
+def fetch_all_records(client, table_id):
+    """Fetch all records using pagination."""
+    all_records = []
+    page_size = 100
+    skip = 0
+    
+    while True:
+        records = client.records.get_records(
+            table_id=table_id,
+            take=page_size,
+            skip=skip
+        )
+        
+        if not records:
+            break
+            
+        all_records.extend(records)
+        skip += page_size
+        
+        if len(records) < page_size:
+            break
+    
+    return all_records
 ```
 
 ## Error Handling
 
 ```python
-from teable.exceptions import TeableError, ResourceNotFoundError
+from teable.exceptions import ValidationError, APIError
 
-def safe_get_records(client, table_id, **query_params):
-    """Safely get records with error handling."""
-    try:
-        records = client.records.get_records(
-            table_id=table_id,
-            **query_params
-        )
-        return records
-    except ResourceNotFoundError:
-        print("Table not found")
-        return []
-    except TeableError as e:
-        print(f"Error retrieving records: {e}")
-        return []
+try:
+    records = client.records.get_records(
+        table_id="table_id",
+        take=3000  # Exceeds maximum
+    )
+except ValidationError as e:
+    print(f"Validation error: {str(e)}")
+except APIError as e:
+    print(f"API error: {str(e)}")
+    print(f"Status code: {e.status_code}")
+    print(f"Error details: {e.details}")
 ```
 
-## Performance Optimization
+## Best Practices
 
-### Projection Optimization
+### 1. Use Field Projections
 
 ```python
-def get_minimal_records(client, table_id, required_fields):
-    """Get records with only required fields."""
-    return client.records.get_records(
-        table_id=table_id,
-        projection=required_fields,
-        cell_format="json"
-    )
+# DON'T: Fetch all fields when not needed
+records = client.records.get_records(table_id="table_id")
 
-# Example usage
-minimal_records = get_minimal_records(
-    client,
-    "table_id",
-    ["Name", "Email"]
+# DO: Only fetch required fields
+records = client.records.get_records(
+    table_id="table_id",
+    projection=["Name", "Email"]  # Only fetch needed fields
 )
 ```
 
-### Batch Processing
+### 2. Implement Pagination
 
 ```python
-def process_records_in_batches(client, table_id, batch_size=1000):
-    """Process records in batches to manage memory."""
-    processed = 0
+# DON'T: Fetch all records at once
+records = client.records.get_records(table_id="table_id")
+
+# DO: Use pagination
+def process_records_in_batches(client, table_id, batch_size=100):
+    skip = 0
     while True:
         batch = client.records.get_records(
             table_id=table_id,
-            skip=processed,
-            take=batch_size
+            take=batch_size,
+            skip=skip
         )
         
         if not batch:
             break
             
-        for record in batch:
-            # Process record
-            process_record(record)
-            
-        processed += len(batch)
-        print(f"Processed {processed} records")
+        process_batch(batch)
+        skip += batch_size
 ```
 
-## Best Practices
+### 3. Use Efficient Filtering
 
-1. **Query Optimization**
-   - Use projections to limit returned fields
-   - Implement pagination for large datasets
-   - Use appropriate filters to reduce data transfer
-   - Consider caching frequently accessed data
+```python
+# DON'T: Filter in memory
+records = client.records.get_records(table_id="table_id")
+filtered = [r for r in records if r["Age"] > 30]  # Inefficient
 
-2. **Error Handling**
-   - Implement comprehensive error handling
-   - Handle resource not found cases
-   - Provide meaningful error messages
-   - Consider retry strategies
+# DO: Filter at API level
+records = client.records.get_records(
+    table_id="table_id",
+    filter={
+        "filterSet": [
+            {
+                "fieldId": "Age",
+                "operator": "isGreaterThan",
+                "value": 30
+            }
+        ]
+    }
+)
+```
 
-3. **Performance**
-   - Use batch processing for large datasets
-   - Optimize query filters
-   - Monitor query performance
-   - Use appropriate cell formats
+### 4. Handle Rate Limits
 
-4. **Data Format**
-   - Choose appropriate cell formats
-   - Use consistent field key types
-   - Handle null values appropriately
-   - Document format requirements
+```python
+import time
+from teable.exceptions import APIError
 
-## Next Steps
+def get_records_with_retry(client, table_id, max_retries=3):
+    for attempt in range(max_retries):
+        try:
+            return client.records.get_records(table_id=table_id)
+        except APIError as e:
+            if e.status_code == 429:  # Rate limit
+                if attempt < max_retries - 1:
+                    time.sleep(2 ** attempt)  # Exponential backoff
+                    continue
+            raise
+    raise Exception("Max retries exceeded")
+```
 
-After mastering record querying, you can:
+### 5. Cache Results When Appropriate
 
-- [Update existing records](update.md)
-- [Delete records](delete.md)
-- [Work with views](../views/creation.md)
-- [Implement data synchronization](../integration/sync.md)
+```python
+from functools import lru_cache
+from datetime import datetime, timedelta
+
+@lru_cache(maxsize=100)
+def get_cached_record(client, table_id, record_id):
+    """Cache individual record lookups."""
+    return client.records.get_record(
+        table_id=table_id,
+        record_id=record_id
+    )
+
+class RecordCache:
+    """Time-based cache for record queries."""
+    def __init__(self, ttl_seconds=300):
+        self.cache = {}
+        self.ttl = timedelta(seconds=ttl_seconds)
+    
+    def get_records(self, client, table_id, **query_params):
+        cache_key = f"{table_id}:{str(query_params)}"
+        now = datetime.now()
+        
+        if cache_key in self.cache:
+            result, timestamp = self.cache[cache_key]
+            if now - timestamp < self.ttl:
+                return result
+        
+        result = client.records.get_records(
+            table_id=table_id,
+            **query_params
+        )
+        self.cache[cache_key] = (result, now)
+        return result
