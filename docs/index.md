@@ -1,79 +1,101 @@
-# Welcome to Teable-Client Documentation
+# Teable Client Library
 
-Welcome to the official documentation for the Teable-Client Python library. This comprehensive guide will help you understand and effectively use the Teable-Client library for interacting with the Teable API.
+A professional Python client library for interacting with the Teable API. This library provides a comprehensive, object-oriented interface for managing spaces, bases, tables, records, fields, and views in Teable.
 
 ## Overview
 
-Teable-Client is a professional Python library that provides an object-oriented interface for managing tables, records, fields, and views in Teable. Whether you're building a simple data management solution or a complex application, this library offers the tools and flexibility you need.
+The Teable Client Library is designed to provide a seamless interface to Teable's API, offering:
 
-## Key Features
+### 🔐 Authentication & Authorization
+- API key-based authentication for basic operations
+- Full email/password authentication for advanced operations
+- Role-based access control and permissions management
 
-### Complete API Coverage 🌐
+### 📊 Data Management
+- Complete CRUD operations for spaces, bases, tables, and records
+- Efficient batch operations for bulk data handling
+- Advanced querying with filtering, sorting, and pagination
+- Field type validation and configuration
 
-- Full Teable API support with an intuitive object-oriented interface
-- Comprehensive field type support with validation
-- Dashboard and plugin management
-- Data aggregation and analytics
-- User authentication and profile management
-- File attachment handling
-- Selection and range operations
+### 🎯 Key Features
+- **Hierarchical Structure**: Follows Teable's Space → Base → Table → Record hierarchy
+- **Type Safety**: Comprehensive type hints for better IDE support
+- **Error Handling**: Detailed error messages and exception handling
+- **Resource Management**: Efficient handling of API resources and rate limits
+- **Batch Operations**: Optimized bulk operations for records and tables
+- **Query Builder**: Intuitive interface for complex data queries
+- **Field Types**: Support for all Teable field types with validation
 
-### Data Management 💾
+## Requirements
 
-- Efficient batch operations for creating, updating, and deleting records
-- Advanced querying capabilities with a fluent query builder
-- Field calculation planning and conversion
-- Table and view management
-- Record selection and manipulation
+- Python 3.7+
+- Valid Teable API key
+- For advanced operations: Teable account credentials
 
-### Performance & Reliability ⚡
+## Quick Installation
 
-- Automatic rate limiting and retry handling
-- Resource caching for improved performance
-- Connection pooling and management
-- Error handling and validation
+```bash
+pip install teable-client
+```
 
-### Developer Experience 👨‍💻
+## Basic Usage
 
-- Type hints for better IDE support
-- Detailed documentation and examples
-- Comprehensive test coverage
-- Professional logging and debugging
+```python
+from teable import TeableClient, TeableConfig
 
-## Core Components
+# Initialize with API key
+client = TeableClient(TeableConfig(
+    api_key="your-api-key",
+    api_url="https://api.teable.io"
+))
 
-The Teable client provides several specialized manager classes for different aspects of the API:
+# For operations requiring authentication
+client.auth.signin(email="your-email", password="your-password")
 
-- **TableManager**: Handle table operations, metadata, and structure
-- **FieldManager**: Manage field definitions, types, and calculations
-- **RecordManager**: Create, update, and delete records
-- **ViewManager**: Configure and manage table views
-- **DashboardManager**: Create and manage dashboards and widgets
-- **AggregationManager**: Perform data aggregation and analytics
-- **SelectionManager**: Handle table selection and range operations
-- **AttachmentManager**: Manage file uploads and attachments
-- **AuthManager**: Handle user authentication and profile management
+# Get a table
+table = client.get_table("table_id")
 
-## Getting Started
+# Create a record
+record = table.create_record({
+    "Name": "John Doe",
+    "Email": "john@example.com"
+})
 
-To get started with Teable-Client, visit our [Installation Guide](getting-started/installation.md) and [Quick Start Guide](getting-started/quickstart.md).
+# Query records
+results = table.get_records(
+    filter={"fieldName": "Email", "operator": "contains", "value": "@example.com"},
+    sort=[{"field": "Name", "order": "asc"}],
+    take=10
+)
+```
+
+## Important Notes
+
+1. **Authentication Levels**:
+   - API key alone provides limited access
+   - Full access requires both API key and user authentication
+   - Some operations (like space management) always require user authentication
+
+2. **Resource Hierarchy**:
+   - Spaces contain bases
+   - Bases contain tables
+   - Tables contain records
+   - Each level has its own permissions and access controls
+
+3. **Best Practices**:
+   - Always handle exceptions appropriately
+   - Use batch operations for bulk data management
+   - Implement proper rate limiting in your application
+   - Close the client when finished to free resources
 
 ## Documentation Structure
 
-This documentation is organized into several main sections:
+This documentation is organized into several sections:
 
-- **Getting Started**: Installation, configuration, and basic usage
-- **Spaces**: Managing workspaces and organizational units
-- **Bases**: Working with databases and data collections
-- **Tables**: Creating and managing data tables
-- **Records**: CRUD operations and bulk data management
-- **Advanced Topics**: Authentication, error handling, and best practices
-- **API Reference**: Detailed documentation of all classes and methods
+- **Getting Started**: Basic setup and quick start guide
+- **Core Concepts**: Understanding the fundamental components
+- **Advanced Topics**: Detailed guides for specific features
+- **API Reference**: Complete API documentation
+- **Examples**: Real-world usage examples
 
-## Support and Contributing
-
-If you encounter any issues or would like to contribute to the project, please visit our GitHub repository. We welcome contributions and feedback from the community!
-
-## License
-
-This project is licensed under the MIT License. See the LICENSE file in the repository for more details.
+Choose a section from the navigation menu to get started!

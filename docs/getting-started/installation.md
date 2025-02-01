@@ -1,127 +1,176 @@
 # Installation Guide
 
-This guide will walk you through the process of installing and configuring the Teable-Client library in your Python environment.
+This guide will walk you through the process of installing and configuring the Teable Client Library.
 
-## Requirements
+## System Requirements
+
+Before installing the Teable Client Library, ensure your system meets these requirements:
 
 - Python 3.7 or higher
 - pip (Python package installer)
-- A Teable instance and API key
+- Access to a Teable instance
+- Teable API key
+- For advanced operations: Teable account credentials
 
 ## Installation Methods
 
-### Using pip (Recommended)
+### 1. Using pip (Recommended)
 
-The simplest way to install Teable-Client is using pip:
+The simplest way to install the Teable Client Library is using pip:
 
 ```bash
 pip install teable-client
 ```
 
-### Installing from Source
+### 2. Installing from Source
 
-If you want to install from source, you can clone the repository and install using pip:
+For the latest development version, you can install directly from the source:
 
 ```bash
-git clone https://github.com/teableio/teable-client.git
+git clone https://github.com/your-organization/teable-client.git
 cd teable-client
 pip install -e .
 ```
 
-## Configuration
+## Environment Setup
 
-After installation, you'll need to configure the client with your Teable instance details.
+### 1. API Key Configuration
 
-### Basic Configuration
+You'll need a Teable API key to use the library. There are several ways to configure it:
 
-```python
-from teable import TeableClient, TeableConfig
+#### Option 1: Environment Variables
 
-# Initialize with basic configuration
-config = TeableConfig(
-    api_url="https://your-teable-instance.com/api",
-    api_key="your-api-key"
-)
-client = TeableClient(config)
-```
-
-### Advanced Configuration
-
-You can customize the client behavior with additional configuration options:
-
-```python
-config = TeableConfig(
-    api_url="https://your-teable-instance.com/api",
-    api_key="your-api-key",
-    timeout=30,  # Request timeout in seconds
-    max_retries=3  # Number of retry attempts for failed requests
-)
-```
-
-## Verifying Installation
-
-To verify that the installation was successful, you can run a simple test:
-
-```python
-from teable import TeableClient, TeableConfig
-
-# Initialize the client
-config = TeableConfig(
-    api_url="https://your-teable-instance.com/api",
-    api_key="your-api-key"
-)
-client = TeableClient(config)
-
-# Test the connection
-try:
-    # Attempt to get spaces
-    spaces = client.spaces.get_all()
-    print(f"Connected successfully. Found {len(spaces)} spaces.")
-except Exception as e:
-    print(f"Connection failed: {str(e)}")
-```
-
-## Environment Variables
-
-For better security, you can use environment variables to store sensitive configuration:
-
-```python
-import os
-from teable import TeableClient, TeableConfig
-
-config = TeableConfig(
-    api_url=os.getenv("TEABLE_API_URL"),
-    api_key=os.getenv("TEABLE_API_KEY")
-)
-```
-
-Set these environment variables in your shell:
+Create a `.env` file in your project root:
 
 ```bash
-export TEABLE_API_URL="https://your-teable-instance.com/api"
-export TEABLE_API_KEY="your-api-key"
+TEABLE_API_KEY=your_api_key_here
+TEABLE_API_URL=https://api.teable.io  # Optional, defaults to this value
+```
+
+Then in your code:
+
+```python
+from teable import TeableClient
+client = TeableClient.from_env()
+```
+
+#### Option 2: Direct Configuration
+
+```python
+from teable import TeableClient, TeableConfig
+
+config = TeableConfig(
+    api_key="your_api_key_here",
+    api_url="https://api.teable.io"  # Optional
+)
+client = TeableClient(config)
+```
+
+### 2. Authentication Setup
+
+For operations requiring full access (like space management), you'll need to authenticate:
+
+```python
+# After client initialization
+client.auth.signin(
+    email="your-email@example.com",
+    password="your-password"
+)
+```
+
+## Verification
+
+To verify your installation and configuration:
+
+```python
+from teable import TeableClient, TeableConfig
+
+# Initialize client
+config = TeableConfig(
+    api_key="your_api_key_here"
+)
+client = TeableClient(config)
+
+# Test authentication
+try:
+    # Sign in (required for full access)
+    client.auth.signin(
+        email="your-email@example.com",
+        password="your-password"
+    )
+    print("Authentication successful!")
+    
+    # Test API access
+    spaces = client.spaces.get_spaces()
+    print(f"Found {len(spaces)} spaces")
+    
+except Exception as e:
+    print(f"Setup verification failed: {str(e)}")
+```
+
+## Development Installation
+
+If you're planning to contribute to the library or need to run tests:
+
+1. Clone the repository:
+```bash
+git clone https://github.com/your-organization/teable-client.git
+cd teable-client
+```
+
+2. Install development dependencies:
+```bash
+pip install -r requirements-test.txt
+```
+
+3. Set up test environment:
+Create a `.env` file in the `tests` directory:
+```bash
+TEABLE_API_KEY=your_api_key_here
+TEABLE_API_URL=https://api.teable.io
+TEABLE_EMAIL=your-email@example.com
+TEABLE_PASSWORD=your-password
+```
+
+4. Run tests:
+```bash
+pytest tests/
 ```
 
 ## Troubleshooting
 
-### Version Conflicts
+### Common Issues
 
-If you encounter package version conflicts, you can create a virtual environment:
+1. **ImportError: No module named 'teable'**
+   - Verify the installation: `pip list | grep teable`
+   - Try reinstalling: `pip install --force-reinstall teable-client`
 
-```bash
-# Create a virtual environment
-python -m venv teable-env
+2. **Authentication Errors**
+   - Verify your API key is correct
+   - Check if your account credentials are valid
+   - Ensure you're using the correct API URL
 
-# Activate the environment
-# On Windows:
-teable-env\Scripts\activate
-# On Unix or MacOS:
-source teable-env/bin/activate
+3. **Permission Errors**
+   - Verify you've signed in for operations requiring authentication
+   - Check your account has the necessary permissions
 
-# Install teable-client in the virtual environment
-pip install teable-client
-```
+### Getting Help
+
+If you encounter issues:
+
+1. Check the [error handling documentation](../advanced/error-handling.md)
+2. Review the [API Reference](../api/client.md)
+3. Search existing GitHub issues
+4. Create a new issue with:
+   - Python version
+   - Library version
+   - Error message
+   - Minimal code example
 
 ## Next Steps
 
-Now that you have installed and configured Teable-Client, proceed to the [Quick Start Guide](quickstart.md) to learn how to perform basic operations with the library.
+Once you've completed the installation:
+
+1. Follow the [Quickstart Guide](quickstart.md)
+2. Review [Best Practices](../advanced/best-practices.md)
+3. Explore the [API Reference](../api/client.md)

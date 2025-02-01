@@ -1,62 +1,84 @@
-# Quick Start Guide
+# Quickstart Guide
 
-This guide will help you get started with the Teable-Client library by walking through common operations and basic usage patterns.
+This guide will help you get started with the Teable Client Library through practical examples.
 
 ## Basic Setup
 
-First, import the necessary classes and initialize the client:
+First, import the necessary classes and create a client instance:
 
 ```python
 from teable import TeableClient, TeableConfig
 
-# Initialize the client
-config = TeableConfig(
-    api_url="https://your-teable-instance.com/api",
-    api_key="your-api-key"
+# Initialize client with API key
+client = TeableClient(TeableConfig(
+    api_key="your_api_key_here",
+    api_url="https://api.teable.io"
+))
+
+# Sign in for full access
+client.auth.signin(
+    email="your-email@example.com",
+    password="your-password"
 )
-client = TeableClient(config)
 ```
 
-## Working with Spaces and Bases
+## Working with Spaces
 
-### Managing Spaces
+Spaces are the top-level containers in Teable. Here's how to work with them:
 
 ```python
-# Get all spaces
-spaces = client.spaces.get_all()
-print(f"Found {len(spaces)} spaces")
-
 # Create a new space
-space = client.spaces.create(name="My New Space")
-print(f"Created space: {space.name}")
+space = client.spaces.create_space(name="My Project Space")
+
+# List all spaces
+spaces = client.spaces.get_spaces()
+for space in spaces:
+    print(f"Space: {space.name} (ID: {space.space_id})")
 
 # Get a specific space
-space = client.spaces.get("space_id")
+space = client.spaces.get_space("space_id")
+
+# Update space name
+space.update("Updated Space Name")
+
+# Create an invitation link
+invitation = space.create_invitation_link(role="editor")
+print(f"Invitation URL: {invitation.invite_url}")
+
+# Invite users by email
+space.invite_by_email(
+    emails=["user@example.com"],
+    role="editor"
+)
 ```
 
-### Managing Bases
+## Managing Bases
+
+Bases are containers for tables within a space:
 
 ```python
 # Create a base in a space
-base = client.tables.create(
-    space_id="space_id",
-    name="My New Base"
-)
-print(f"Created base: {base.name}")
+base = space.create_base(name="My Project Base")
 
-# Get a specific base
-base = client.tables.get("base_id")
+# Get all bases in a space
+bases = space.get_bases()
+for base in bases:
+    print(f"Base: {base.name} (ID: {base.base_id})")
+
+# Delete a base
+base.delete()
 ```
 
 ## Working with Tables
 
-### Managing Tables
+Tables store your actual data:
 
 ```python
-# Create a table in a base
-table = client.tables.create(
-    base_id="base_id",
+# Create a table with fields
+table = client.tables.create_table(
+    base_id=base.base_id,
     name="Employees",
+    db_table_name="employees",
     fields=[
         {
             "name": "Name",
@@ -69,240 +91,138 @@ table = client.tables.create(
         },
         {
             "name": "Age",
-            "type": "number"
+            "type": "number",
+            "precision": 0
         }
     ]
 )
-print(f"Created table: {table.name}")
 
-# Get a specific table
-table = client.tables.get("table_id")
+# Get table fields
+fields = table.fields
+for field in fields:
+    print(f"Field: {field.name} ({field.field_type})")
 ```
 
-### Working with Records
+## Managing Records
+
+Records are the individual data entries in a table:
 
 ```python
 # Create a single record
-record = client.records.create(
-    table_id="table_id",
-    fields={
-        "Name": "John Doe",
-        "Email": "john@example.com",
-        "Age": 30
-    }
-)
-print(f"Created record ID: {record.record_id}")
+record = table.create_record({
+    "Name": "John Doe",
+    "Email": "john@example.com",
+    "Age": 30
+})
 
-# Batch create multiple records
+# Batch create records
 records_data = [
-    {"Name": "Alice", "Age": 28},
-    {"Name": "Bob", "Age": 32}
+    {"Name": "Alice Smith", "Email": "alice@example.com", "Age": 25},
+    {"Name": "Bob Johnson", "Email": "bob@example.com", "Age": 35}
 ]
-batch_result = client.records.batch_create_records(
-    table_id="table_id",
-    records=records_data
-)
+batch_result = table.batch_create_records(records_data)
 print(f"Created {batch_result.success_count} records")
 
-# Get records with filtering and sorting
-records = client.tables.get_records(
-    table_id="table_id",
-    filter={
-        "operator": "and",
-        "conditions": [
-            {
-                "field": "Age",
-                "operator": ">",
-                "value": 25
-            },
-            {
-                "field": "Department",
-                "operator": "=",
-                "value": "Engineering"
-            }
-        ]
-    },
-    order_by="Name"
+# Query records with filtering
+filter_data = {
+    "filterSet": [
+        {
+            "fieldId": "Age",
+            "operator": "isGreaterEqual",
+            "value": 30
+        }
+    ],
+    "conjunction": "and"
+}
+
+filtered_records = table.get_records(
+    filter=filter_data,
+    field_key_type="name"
 )
 
-# Process records
-for record in records:
-    print(f"Name: {record.fields['Name']}, Age: {record.fields['Age']}")
-```
+# Update a record
+updated_record = table.update_record(
+    record.record_id,
+    {"Age": 31}
+)
 
-## Working with Fields
+# Delete a record
+table.delete_record(record.record_id)
 
-### Managing Fields
-
-```python
-# Get all fields in a table
-fields = table.fields
-
-# Access field properties
-for field in fields:
-    print(f"{field.name} ({field.field_type})")
-    if field.is_required:
-        print("  Required field")
-    if field.is_primary:
-        print("  Primary field")
-
-# Get a specific field
-field = table.get_field("field_id")
-```
-
-### Field Validation
-
-```python
-from teable.exceptions import ValidationError
-
-# Validate field values
-try:
-    field.validate_value("test@example.com")
-    print("Value is valid")
-except ValidationError as e:
-    print(f"Invalid value: {e}")
+# Batch delete records
+record_ids = [record.record_id for record in filtered_records]
+table.batch_delete_records(record_ids)
 ```
 
 ## Working with Views
 
-### Managing Views
+Views provide different ways to visualize table data:
 
 ```python
-# Create a new view
-view = client.views.create(
-    table_id="table_id",
-    name="Engineering Team",
-    type="grid",
-    filter={
-        "operator": "and",
-        "conditions": [
+# Create a view
+view = table.create_view({
+    "name": "Age Filter View",
+    "type": "grid",
+    "filter": {
+        "filterSet": [
             {
-                "field": "Department",
-                "operator": "=",
-                "value": "Engineering"
+                "fieldId": "Age",
+                "operator": "isGreaterEqual",
+                "value": 30
             }
-        ]
+        ],
+        "conjunction": "and"
     }
-)
+})
 
-# Get records from a specific view
-records = client.tables.get_records(
-    table_id="table_id",
-    view_id=view.view_id
-)
-```
-
-## Using Query Builder
-
-```python
-# Create a query builder
-query = table.query()
-
-# Add filters
-query.filter(
-    field="Age",
-    operator=FilterOperator.GREATER_THAN,
-    value=25
-)
-query.filter(
-    field="Department",
-    operator=FilterOperator.EQUALS,
-    value="Engineering"
-)
-
-# Add sorting
-query.sort(
-    field="Name",
-    direction=SortDirection.ASCENDING
-)
-
-# Add pagination
-query.paginate(take=10, skip=0)
-
-# Execute the query
-records = table.get_records(query=query.build())
+# Get all views
+views = table.views
+for view in views:
+    print(f"View: {view.name} (Type: {view.view_type})")
 ```
 
 ## Error Handling
 
+Always handle potential errors in your code:
+
 ```python
-from teable.exceptions import (
-    TeableError,
-    ValidationError,
-    AuthenticationError,
-    ResourceNotFoundError,
-    RateLimitError
-)
+from teable.exceptions import ValidationError, APIError
 
 try:
-    # Attempt an operation
-    record = client.records.create(
-        table_id="table_id",
-        fields={"invalid": "data"}
-    )
+    # Attempt to create a record with invalid data
+    record = table.create_record({
+        "Name": "",  # Required field is empty
+        "Email": "invalid-email"
+    })
 except ValidationError as e:
-    print(f"Validation error: {e}")
-except AuthenticationError as e:
-    print(f"Authentication failed: {e}")
-except ResourceNotFoundError as e:
-    print(f"Resource not found: {e}")
-except RateLimitError as e:
-    print(f"Rate limit exceeded: {e}")
-except TeableError as e:
-    print(f"General error: {e}")
+    print(f"Validation error: {str(e)}")
+except APIError as e:
+    print(f"API error: {str(e)}")
+except Exception as e:
+    print(f"Unexpected error: {str(e)}")
 ```
 
 ## Best Practices
 
-1. **Use Batch Operations**: When working with multiple records, use batch operations instead of individual calls:
-   ```python
-   # Good - batch operation
-   records = [{"Name": f"User {i}"} for i in range(100)]
-   result = client.records.batch_create_records(
-       table_id="table_id",
-       records=records
-   )
-   
-   # Avoid - individual calls
-   for i in range(100):
-       client.records.create(
-           table_id="table_id",
-           fields={"Name": f"User {i}"}
-       )
-   ```
+1. **Authentication**:
+   - Always sign in for operations requiring full access
+   - Handle authentication errors appropriately
 
-2. **Handle Rate Limits**: The client automatically handles rate limiting, but you should still structure your code to work efficiently:
-   ```python
-   # Process large datasets in chunks
-   chunk_size = 1000
-   for i in range(0, len(records), chunk_size):
-       chunk = records[i:i + chunk_size]
-       client.records.batch_create_records(
-           table_id="table_id",
-           records=chunk
-       )
-   ```
+2. **Resource Management**:
+   - Use batch operations for multiple records
+   - Clean up resources when no longer needed
 
-3. **Use Query Builder**: Leverage the query builder for complex queries instead of filtering in memory:
-   ```python
-   # Good - server-side filtering
-   query = table.query()\
-       .filter("Age", FilterOperator.GREATER_THAN, 25)\
-       .sort("Name", SortDirection.ASCENDING)\
-       .paginate(take=100)
-   records = table.get_records(query=query.build())
-   
-   # Avoid - client-side filtering
-   all_records = table.get_records()
-   filtered = [r for r in all_records if r.fields['Age'] > 25]
-   ```
+3. **Error Handling**:
+   - Catch specific exceptions
+   - Implement proper error recovery
+
+4. **Performance**:
+   - Use pagination for large datasets
+   - Implement rate limiting in your application
 
 ## Next Steps
 
-Now that you're familiar with the basics, explore the following topics for more advanced usage:
-
-- [Space Management](../spaces/creation.md)
-- [Base Operations](../bases/creation.md)
-- [Table Operations](../tables/creation.md)
-- [Record Management](../records/create.md)
-- [Advanced Topics](../advanced/authentication.md)
+- Learn about [Authentication](../advanced/authentication.md)
+- Explore [Error Handling](../advanced/error-handling.md)
+- Review [Best Practices](../advanced/best-practices.md)
+- Check the [API Reference](../api/client.md)
